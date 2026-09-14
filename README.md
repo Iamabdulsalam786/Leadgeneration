@@ -28,17 +28,22 @@ sheet, write the same intro 40 times, paste it into WhatsApp. maps2whatsapp is t
 - **Safety built in** — random 45–120 s gaps, typing indicator, skips numbers not on WhatsApp, never messages the same number twice, per-run cap, daily counter, mandatory `{name}` placeholder, confirm dialog showing the exact first message.
 - **One page, four steps.** No accounts, no config files.
 
-## Quick start (3 commands)
+## Install (no coding, no terminal)
 
-Requirements: [Node.js 18+](https://nodejs.org) (that's it). Optional: [Ollama](https://ollama.com) for AI drafts.
+1. Install [Node.js](https://nodejs.org/en/download) (click the big green button, run the installer).
+2. **[Download maps2whatsapp as a ZIP](https://github.com/oyekamal/maps2whatsapp/archive/refs/heads/master.zip)** and unzip it anywhere.
+3. Open the folder and double-click **`start.bat`** (Windows) or **`start.sh`** (macOS / Linux).
+
+The first run installs itself (about a minute), then your browser opens at `http://localhost:3210`. Next time it starts instantly. Close the black window to stop.
+
+<details><summary>Developers: command line</summary>
 
 ```bash
 git clone https://github.com/oyekamal/maps2whatsapp
 cd maps2whatsapp && npm install
-npm start          # opens http://localhost:3210 in your browser
+npm start
 ```
-
-Windows: run the same three lines in PowerShell or Command Prompt.
+</details>
 
 Optional local AI (one time):
 
@@ -80,6 +85,8 @@ tuition centres — anyone whose clients are **local businesses with a Google Ma
 
 **Is it really free?** Yes. Google Maps scraping, WhatsApp sending and the AI all run locally. No API keys, no per-message fees.
 
+**Do I need to know git, npm or the terminal?** No. Download the ZIP, double-click `start.bat` or `start.sh`. Node.js is the only thing to install.
+
 **Do I need Docker or a Google API key?** No. The scraper is a single binary downloaded automatically (~70 MB). Fast mode uses no browser at all.
 
 **What does "Also find emails" do?** Deep mode visits each business website to pull email addresses. Slower, and the scraper downloads a Chromium once for it.
@@ -108,6 +115,7 @@ lib/whatsapp.js    Baileys socket: QR → connect → send with dedupe + daily c
 lib/util.js        CSV parser, phone normalisation, template rendering
 public/index.html  the whole UI, vanilla JS
 test.js            npm test — parser / phone / template checks
+start.bat/.sh      double-click launchers: check Node, npm install once, start, open browser
 ```
 
 Dependencies: `@whiskeysockets/baileys`, `qrcode`, `pino`. Nothing else.

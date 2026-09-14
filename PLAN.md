@@ -38,6 +38,7 @@ server.js  ── lib/scraper.js ── gms binary (~/.maps2whatsapp/bin) ──
 - [x] Personalise: one Ollama call per selected lead rewrites the base using Maps facts (no-website, rating ≥4.5, area); streamed over SSE, editable per lead, falls back to template on error. ~6 s/lead on llama3.2 CPU.
 - [x] WhatsApp: QR over SSE, auto-reconnect after pairing (515), send with presence + gap, skip non-WhatsApp, sent log
 - [x] UI: 4-step single page, table with selection, live preview, progress bar, live log, CSV export
+- [x] Zero-git install: GitHub ZIP + `start.bat` / `start.sh` launchers (check Node, install once, start)
 - [x] `npm test` self-checks; end-to-end verified: 17 camera shops in Islamabad in 11 s, llama3.2 draft, QR emitted
 
 **v0.2 — next**
