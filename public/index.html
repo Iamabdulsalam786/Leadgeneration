@@ -117,7 +117,7 @@ function drawTable() {
   $('tbody').innerHTML = leads.map(l => `<tr>
     <td>${l.phone ? `<input type="checkbox" data-p="${l.phone}" ${selected.has(l.phone) ? 'checked' : ''}>` : '<span class="mute" title="no phone">–</span>'}</td>
     <td><b>${esc(l.name)}</b></td><td>${l.phone ? '+' + l.phone : '<span class="mute">no phone</span>'}</td>
-    <td>${l.review_rating ? `${l.review_rating} <span class="mute">(${l.review_count})</span>` : ''}</td><td>${esc(l.category)}</td>
+    <td>${l.review_rating ? l.review_rating + (+l.review_count ? ` <span class="mute">(${l.review_count})</span>` : '') : ''}</td><td>${esc(l.category)}</td>
     <td class="mute">${esc(l.emails || l.website)}</td></tr>`).join('');
   $('count').textContent = `${leads.length} found · ${leads.filter(l => l.phone).length} with phone · ${selected.size} selected`;
   $('tbody').querySelectorAll('input').forEach(cb => cb.onchange = () => { cb.checked ? selected.add(cb.dataset.p) : selected.delete(cb.dataset.p); drawTable(); preview(); });
