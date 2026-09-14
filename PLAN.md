@@ -35,6 +35,7 @@ server.js  ── lib/scraper.js ── gms binary (~/.maps2whatsapp/bin) ──
 **v0.1 — shipped (2026-09-14)**
 - [x] Scrape: business + location → geocode (Nominatim) → gosom fast mode → lean leads, deduped, phones normalised
 - [x] Draft: Ollama prompt with rules (40–70 words, `{name}`, opt-out, no links); fallback template
+- [x] Personalise: one Ollama call per selected lead rewrites the base using Maps facts (no-website, rating ≥4.5, area); streamed over SSE, editable per lead, falls back to template on error. ~6 s/lead on llama3.2 CPU.
 - [x] WhatsApp: QR over SSE, auto-reconnect after pairing (515), send with presence + gap, skip non-WhatsApp, sent log
 - [x] UI: 4-step single page, table with selection, live preview, progress bar, live log, CSV export
 - [x] `npm test` self-checks; end-to-end verified: 17 camera shops in Islamabad in 11 s, llama3.2 draft, QR emitted
@@ -44,7 +45,7 @@ server.js  ── lib/scraper.js ── gms binary (~/.maps2whatsapp/bin) ──
 - [ ] CSV import (bring your own list) and per-row custom `message` column
 - [ ] Follow-up sequence: second message after N days to non-repliers (needs reply detection)
 - [ ] Reply inbox tab: show incoming replies from contacted numbers; auto-mark "no" as opted out
-- [ ] Roman Urdu / Urdu drafting presets; per-lead AI personalisation (rating, category, review snippets)
+- [ ] Roman Urdu / Urdu drafting presets; use review snippets (deep mode) in personalisation
 - [ ] `npx maps2whatsapp` publish to npm; packaged `.exe`/`.app` via `pkg` or Bun compile for non-developers
 
 **v0.3 — later**

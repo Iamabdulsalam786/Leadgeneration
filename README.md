@@ -11,7 +11,7 @@ No Meta Business API. No Docker. No cloud. No subscription. Works on **Windows, 
 
 ```
 Business type + City  →  Google Maps leads (name, phone, rating, website)
-                      →  AI-drafted message you can edit ({name} is filled in per business)
+                      →  AI-drafted base message  →  AI rewrites it for EACH business (rating, no website, area…)
                       →  Scan QR with WhatsApp  →  sent one by one with human-like gaps
 ```
 
@@ -24,7 +24,7 @@ sheet, write the same intro 40 times, paste it into WhatsApp. maps2whatsapp is t
 
 - **Google Maps scraper** — powered by the open-source [gosom/google-maps-scraper](https://github.com/gosom/google-maps-scraper) binary, auto-downloaded on first run. Fast mode needs no browser and returns ~20–100 businesses in seconds.
 - **WhatsApp bulk sender from your own number** — uses the WhatsApp Web protocol ([Baileys](https://github.com/WhiskeySockets/Baileys)). Scan a QR code like WhatsApp Web. Free.
-- **Local LLM message drafting** — [Ollama](https://ollama.com) + `llama3.2` (2 GB) writes a warm, specific 40–70 word message with an opt-out line. Your data never leaves your machine. Works without Ollama too (plain template).
+- **Local LLM message drafting, per business** — [Ollama](https://ollama.com) + `llama3.2` (2 GB) writes a warm 40–70 word base message, then **rewrites it for every selected business** using its name, category, rating, website and area ("since you don't have a website yet…"). Every message is editable before it goes out. Your data never leaves your machine. Works without Ollama too (plain template with `{name}`).
 - **Safety built in** — random 45–120 s gaps, typing indicator, skips numbers not on WhatsApp, never messages the same number twice, per-run cap, daily counter, mandatory `{name}` placeholder, confirm dialog showing the exact first message.
 - **One page, four steps.** No accounts, no config files.
 
@@ -49,7 +49,7 @@ ollama pull llama3.2     # or any model: qwen2.5, gemma3, mistral, phi4…
 ## How to use
 
 1. **Find businesses** — enter e.g. `painters` and `Lahore, Pakistan`, pick how many (~20 to ~100), click *Search*. Results appear in a table with a checkbox per business. Untick anyone you don't want. *Download CSV* keeps the list.
-2. **Write your message** — fill in who you are and what you offer, click *Draft with AI*. Edit the text freely. `{name}` becomes each business's name; `{category}` and `{location}` also work. A live preview shows the real first message.
+2. **Write your message** — fill in who you are and what you offer, click *Draft with AI*. Edit the text freely. `{name}` becomes each business's name; `{category}` and `{location}` also work. Then click *Personalise each message with AI*: the local model writes a unique version for every selected business (5–20 s each) and lists them all for editing. Whatever you see there is exactly what gets sent.
 3. **Connect WhatsApp** — click *Connect*, scan the QR code with WhatsApp → *Linked devices* → *Link a device*. The session is saved, so you scan once.
 4. **Send** — set the cap (default 15) and gaps (default 45–120 s), click *Send to selected*, confirm. Watch the live log. *Stop* at any time.
 

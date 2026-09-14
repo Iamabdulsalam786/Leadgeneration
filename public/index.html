@@ -63,6 +63,11 @@
   <textarea id="template" placeholder="Hi {name}, …"></textarea>
   <div id="dnote" class="hint"></div>
   <div class="hint">Preview for the first selected business:</div><div class="preview" id="preview">—</div>
+  <div class="row" style="margin-top:14px;align-items:center">
+    <div style="flex:0"><button id="personalise">Personalise each message with AI</button></div>
+    <div class="hint" id="pnote">Writes a unique message per selected business using its name, category, rating, website and area (about 5–20 s each on a laptop). Edit any of them below. Businesses without a custom message get the template.</div>
+  </div>
+  <div id="custom"></div>
 </section>
 
 <section id="s3">
@@ -91,7 +96,7 @@
 <script>
 const $ = id => document.getElementById(id);
 const api = (p, b) => fetch(p, b ? { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(b) } : { method: p.startsWith('/api/wa') || p.startsWith('/api/send') ? 'POST' : 'GET' }).then(r => r.json());
-let leads = [], selected = new Set();
+let leads = [], selected = new Set(), custom = {}; // custom[phone] = per-business AI message
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const render = (t, l) => t.replace(/\{(name|category|address|location|business)\}/g, (_, k) => l[k] ?? '');
 const logTo = (el, line) => { el.hidden = false; el.textContent += line + '\n'; el.scrollTop = el.scrollHeight; };
@@ -110,7 +115,7 @@ $('search').onclick = async () => {
   const r = await api('/api/scrape', { business: $('business').value.trim(), location: $('location').value.trim(), cc: $('cc').value.trim(), depth: +$('depth').value, deep: $('deep').checked }).catch(e => ({ error: e.message }));
   $('search').disabled = false;
   if (r.error) return logTo($('slog'), '✗ ' + r.error);
-  leads = r.leads; selected = new Set(leads.filter(l => l.phone).map(l => l.phone));
+  leads = r.leads; selected = new Set(leads.filter(l => l.phone).map(l => l.phone)); custom = {}; $('custom').innerHTML = '';
   drawTable(); $('results').hidden = false; preview();
 };
 function drawTable() {
@@ -132,7 +137,23 @@ $('draft').onclick = async () => {
   $('draft').disabled = false; $('template').value = r.template; preview();
   $('dnote').textContent = r.fallback ? `Ollama unavailable (${r.error}) — using a plain template. Edit it below.` : 'Drafted by your local AI. Edit anything you like.';
 };
-function preview() { const l = leads.find(x => selected.has(x.phone)) || { name: 'Bright Walls Painters', category: 'Painter', location: $('location').value, business: $('business').value }; $('preview').textContent = $('template').value ? render($('template').value, l) : '—'; }
+function preview() { const l = leads.find(x => selected.has(x.phone)) || { name: 'Bright Walls Painters', category: 'Painter', location: $('location').value, business: $('business').value }; $('preview').textContent = custom[l.phone] || ($('template').value ? render($('template').value, l) : '—'); }
+const msgFor = l => custom[l.phone] || render($('template').value, l);
+$('personalise').onclick = async () => {
+  const list = leads.filter(l => selected.has(l.phone));
+  if (!list.length) return alert('Search and select some businesses first.');
+  if (!$('template').value.includes('{name}')) return alert('Write or draft a template with {name} first — it is the base the AI personalises.');
+  $('personalise').disabled = true; $('custom').innerHTML = ''; $('pnote').textContent = `Personalising 0/${list.length}…`;
+  const r = await api('/api/personalise', { leads: list, template: $('template').value, business: $('business').value, location: $('location').value, offer: $('offer').value, sender: $('sender').value, model: $('model').value, lang: $('lang').value });
+  $('personalise').disabled = false; $('pnote').textContent = r.error ? '✗ ' + r.error : `Done — ${list.length} custom messages. Edit any below; they are what gets sent.`;
+};
+function addCustom(d) {
+  custom[d.phone] = d.message;
+  const div = document.createElement('div'); div.style.marginTop = '10px';
+  div.innerHTML = `<label><b>${esc(d.name)}</b> · +${d.phone}${d.error ? ` <span class="bad">(AI failed: ${esc(d.error)} — template used)</span>` : ''}</label><textarea style="min-height:90px"></textarea>`;
+  const ta = div.querySelector('textarea'); ta.value = d.message; ta.oninput = () => { custom[d.phone] = ta.value; preview(); };
+  $('custom').appendChild(div); preview();
+}
 $('template').oninput = preview;
 
 // ── step 3
@@ -148,10 +169,10 @@ $('logout').onclick = () => api('/api/wa/logout');
 // ── step 4
 $('send').onclick = async () => {
   const t = $('template').value;
-  if (!t.includes('{name}')) return alert('The template must contain {name}.');
-  const list = leads.filter(l => selected.has(l.phone));
+  const list = leads.filter(l => selected.has(l.phone)).map(l => ({ ...l, message: custom[l.phone] || '' }));
+  if (!t.includes('{name}') && !list.every(l => l.message)) return alert('The template must contain {name}.');
   if (!list.length) return alert('Select at least one business with a phone number.');
-  if (!confirm(`Send to up to ${Math.min(list.length, +$('limit').value)} businesses from YOUR WhatsApp number?\n\nFirst message will read:\n\n${render(t, list[0])}`)) return;
+  if (!confirm(`Send to up to ${Math.min(list.length, +$('limit').value)} businesses from YOUR WhatsApp number?\n\nFirst message will read:\n\n${list[0].message || render(t, list[0])}`)) return;
   const r = await api('/api/send', { leads: list, template: t, limit: +$('limit').value, minGap: +$('gmin').value, maxGap: +$('gmax').value });
   if (r.error) alert(r.error); else { $('send').disabled = true; $('stop').disabled = false; $('log').textContent = ''; }
 };
@@ -161,6 +182,7 @@ $('stop').onclick = () => api('/api/send/stop');
 const es = new EventSource('/api/events');
 es.addEventListener('qr', e => { $('qr').innerHTML = `<img alt="WhatsApp QR code" src="${JSON.parse(e.data).qr}">`; $('wanote').textContent = 'Scan this with WhatsApp → Linked devices. It refreshes every ~20 s.'; });
 es.addEventListener('wa', e => waStatus(JSON.parse(e.data)));
+es.addEventListener('personalised', e => { const d = JSON.parse(e.data); addCustom(d); $('pnote').textContent = `Personalising ${d.i + 1}/${d.total}…`; });
 es.addEventListener('log', e => { const d = JSON.parse(e.data); logTo($('send').disabled ? $('log') : $('slog'), d.line); });
 es.addEventListener('progress', e => {
   const p = JSON.parse(e.data);

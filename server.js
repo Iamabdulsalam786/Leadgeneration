@@ -21,9 +21,9 @@ async function sendJob({ leads, template, limit = 15, minGap = 45, maxGap = 120 
   const done = wa.sentSet(); let n = 0, sent = 0;
   const todo = leads.filter(l => l.phone && !done.has(l.phone)).slice(0, limit);
   emit('progress', { total: todo.length, done: 0, sent: 0, running: true });
-  for (const l of todo) {
+  for (const l of todo) { // ponytail: per-lead AI message (l.message) wins over the template
     if (job?.stop) break;
-    let r; try { r = await wa.send(l.phone, render(template, l), l.name); } catch (e) { r = { ok: false, reason: e.message }; }
+    let r; try { r = await wa.send(l.phone, l.message || render(template, l), l.name); } catch (e) { r = { ok: false, reason: e.message }; }
     n++; if (r.ok) sent++;
     emit('progress', { total: todo.length, done: n, sent, running: true, last: { name: l.name, phone: l.phone, ...r } });
     if (r.ok && n < todo.length && !job?.stop) { // ponytail: human-like gap; WhatsApp bans burst senders
@@ -63,13 +63,22 @@ const server = http.createServer(async (req, res) => {
       try { return json(res, 200, { template: await llm.draft(b), fallback: false }); }
       catch (e) { return json(res, 200, { template: llm.fallback(b), fallback: true, error: e.message }); }
     }
+    if (req.method === 'POST' && url.pathname === '/api/personalise') { // one Ollama call per lead; results stream over SSE
+      const b = await body(req); const out = [];
+      for (const [i, lead] of b.leads.entries()) {
+        let message, error; try { message = await llm.personalise({ ...b, lead }); } catch (e) { error = e.message; message = render(b.template, lead); }
+        out.push({ phone: lead.phone, message, error });
+        emit('personalised', { i, total: b.leads.length, phone: lead.phone, name: lead.name, message, error });
+      }
+      return json(res, 200, { messages: out });
+    }
     if (req.method === 'POST' && url.pathname === '/api/wa/connect') { wa.connect().catch(e => emit('wa', { ...wa.status(), note: e.message })); return json(res, 200, { ok: true }); }
     if (req.method === 'POST' && url.pathname === '/api/wa/logout') { await wa.logout(); return json(res, 200, { ok: true }); }
     if (req.method === 'POST' && url.pathname === '/api/send') {
       if (job) return json(res, 409, { error: 'a send is already running' });
       if (wa.state !== 'connected') return json(res, 400, { error: 'connect WhatsApp first' });
       const b = await body(req);
-      if (!b.template?.includes('{name}')) return json(res, 400, { error: 'template must contain {name}' });
+      if (!b.template?.includes('{name}') && !b.leads.every(l => l.message)) return json(res, 400, { error: 'template must contain {name}' });
       job = { stop: false }; sendJob(b).catch(e => { log('Send failed: ' + e.message); job = null; });
       return json(res, 200, { ok: true });
     }
