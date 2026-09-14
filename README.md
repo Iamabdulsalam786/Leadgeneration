@@ -7,6 +7,8 @@ laptop, no API key), lets you edit it, then sends it from **your own WhatsApp nu
 
 No Meta Business API. No Docker. No cloud. No subscription. Works on **Windows, macOS and Linux**.
 
+![maps2whatsapp screenshot — search results, AI-drafted message, WhatsApp QR](docs/screenshot.png)
+
 ```
 Business type + City  →  Google Maps leads (name, phone, rating, website)
                       →  AI-drafted message you can edit ({name} is filled in per business)
