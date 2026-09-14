@@ -1,0 +1,24 @@
+{
+  "name": "maps2whatsapp",
+  "version": "0.1.0",
+  "description": "Find local businesses on Google Maps and send them personalised WhatsApp messages drafted by a local AI (Ollama). Free, no API keys, no Docker. Windows, macOS, Linux.",
+  "main": "server.js",
+  "bin": { "maps2whatsapp": "server.js" },
+  "scripts": {
+    "start": "node server.js",
+    "test": "node test.js"
+  },
+  "engines": { "node": ">=18" },
+  "keywords": [
+    "google-maps-scraper", "whatsapp-bulk-sender", "whatsapp-marketing", "lead-generation",
+    "local-business-leads", "b2b-outreach", "ollama", "local-llm", "baileys", "freelancer-tools",
+    "cold-outreach", "small-business-marketing", "whatsapp-automation", "lead-scraper"
+  ],
+  "license": "MIT",
+  "repository": { "type": "git", "url": "https://github.com/oyekamal/maps2whatsapp" },
+  "dependencies": {
+    "@whiskeysockets/baileys": "^7.0.0-rc14",
+    "pino": "^10.3.1",
+    "qrcode": "^1.5.4"
+  }
+}

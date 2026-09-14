@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>maps2whatsapp — find businesses, message them on WhatsApp</title>
+<style>
+  :root { --bg:#f6f7f9; --card:#fff; --ink:#1a1d23; --mute:#66707f; --line:#e3e6eb; --brand:#128c7e; --brand2:#25d366; --warn:#b4540a; --bad:#b42318; }
+  * { box-sizing:border-box } body { margin:0; font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif; background:var(--bg); color:var(--ink) }
+  header { background:var(--brand); color:#fff; padding:14px 24px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px }
+  header h1 { margin:0; font-size:18px } header small { opacity:.85 }
+  main { max-width:1000px; margin:0 auto; padding:16px; display:grid; gap:16px }
+  section { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:18px 20px }
+  section h2 { margin:0 0 10px; font-size:16px; display:flex; align-items:center; gap:10px }
+  .n { background:var(--brand); color:#fff; width:24px; height:24px; border-radius:50%; display:inline-grid; place-items:center; font-size:13px }
+  .row { display:flex; gap:10px; flex-wrap:wrap; align-items:end } .row > * { flex:1 1 160px } .row > .s { flex:0 1 110px }
+  label { display:block; font-size:12px; color:var(--mute); margin-bottom:3px }
+  input, textarea, select { width:100%; padding:9px 10px; border:1px solid var(--line); border-radius:8px; font:inherit; background:#fff }
+  textarea { min-height:120px; resize:vertical }
+  button { padding:9px 16px; border:0; border-radius:8px; background:var(--brand); color:#fff; font:inherit; font-weight:600; cursor:pointer } button:disabled { opacity:.5; cursor:default }
+  button.ghost { background:#eef1f4; color:var(--ink) } button.go { background:var(--brand2); color:#083b2b } button.stop { background:var(--bad) }
+  table { width:100%; border-collapse:collapse; font-size:14px; margin-top:12px } th, td { text-align:left; padding:7px 8px; border-bottom:1px solid var(--line) } th { color:var(--mute); font-weight:600; font-size:12px }
+  .wrap { overflow-x:auto } .mute { color:var(--mute) } .warn { color:var(--warn) } .bad { color:var(--bad) } .ok { color:var(--brand) }
+  .log { background:#0f1419; color:#cfe3dc; font:12px/1.5 ui-monospace,Menlo,Consolas,monospace; padding:10px; border-radius:8px; max-height:180px; overflow:auto; white-space:pre-wrap; margin-top:10px }
+  .preview { background:#e7fbe9; border-radius:12px 12px 12px 2px; padding:10px 14px; white-space:pre-wrap; margin-top:10px; max-width:420px }
+  .bar { height:8px; background:var(--line); border-radius:4px; overflow:hidden; margin:10px 0 } .bar i { display:block; height:100%; background:var(--brand2); width:0; transition:width .3s }
+  .pill { font-size:12px; padding:2px 8px; border-radius:99px; background:#eef1f4 } .pill.on { background:#d9f7e4; color:#0b6b3a }
+  #qr img { display:block; width:260px; height:260px; border:1px solid var(--line); border-radius:8px; margin:10px 0 }
+  .hint { font-size:12px; color:var(--mute); margin-top:6px }
+</style>
+</head>
+<body>
+<header><h1>maps2whatsapp</h1><small id="health">checking local AI…</small></header>
+<main>
+
+<section id="s1">
+  <h2><span class="n">1</span> Find businesses</h2>
+  <div class="row">
+    <div><label>Business type</label><input id="business" placeholder="painters, construction companies, camera shops…"></div>
+    <div><label>Location</label><input id="location" placeholder="Lahore, Pakistan"></div>
+    <div class="s"><label>Country code</label><input id="cc" value="92" title="Used only for numbers that lack a + prefix"></div>
+    <div class="s"><label>How many</label><select id="depth"><option value="1">~20</option><option value="2" selected>~40</option><option value="3">~60</option><option value="5">~100</option></select></div>
+    <div class="s"><label><input type="checkbox" id="deep" style="width:auto"> Also find emails</label><span class="hint">slower, downloads a browser once</span></div>
+    <div class="s"><button id="search">Search</button></div>
+  </div>
+  <div id="slog" class="log" hidden></div>
+  <div id="results" hidden>
+    <div class="row" style="margin-top:12px;align-items:center"><span id="count" class="mute"></span><span style="flex:0"><button class="ghost" id="all">Select all</button></span><span style="flex:0"><button class="ghost" id="none">None</button></span><span style="flex:0"><a href="/api/export.csv"><button class="ghost">Download CSV</button></a></span></div>
+    <div class="wrap"><table><thead><tr><th></th><th>Business</th><th>Phone</th><th>Rating</th><th>Category</th><th>Website / email</th></tr></thead><tbody id="tbody"></tbody></table></div>
+  </div>
+</section>
+
+<section id="s2">
+  <h2><span class="n">2</span> Write your message</h2>
+  <div class="row">
+    <div><label>Your name / business</label><input id="sender" placeholder="Kamal, freelance web developer"></div>
+    <div style="flex:2 1 260px"><label>What are you offering?</label><input id="offer" placeholder="build a simple website that brings you customers from Google"></div>
+    <div class="s"><label>Language</label><input id="lang" value="English"></div>
+    <div class="s"><label>Local AI model</label><select id="model"></select></div>
+    <div class="s"><button id="draft">Draft with AI</button></div>
+  </div>
+  <label style="margin-top:12px">Message template — edit freely. <code>{name}</code> becomes each business name; <code>{category}</code>, <code>{location}</code> also work.</label>
+  <textarea id="template" placeholder="Hi {name}, …"></textarea>
+  <div id="dnote" class="hint"></div>
+  <div class="hint">Preview for the first selected business:</div><div class="preview" id="preview">—</div>
+</section>
+
+<section id="s3">
+  <h2><span class="n">3</span> Connect WhatsApp <span id="wapill" class="pill">not connected</span></h2>
+  <p class="mute" style="margin:4px 0 10px">Messages go from <b>your own number</b>. Open WhatsApp on your phone → <b>Linked devices</b> → <b>Link a device</b> → scan.</p>
+  <button id="connect">Connect / show QR</button> <button class="ghost" id="logout">Log out</button>
+  <div id="qr"></div><div id="wanote" class="hint"></div>
+</section>
+
+<section id="s4">
+  <h2><span class="n">4</span> Send</h2>
+  <div class="row">
+    <div class="s"><label>Max messages this run</label><input id="limit" type="number" value="15" min="1"></div>
+    <div class="s"><label>Gap min (s)</label><input id="gmin" type="number" value="45" min="10"></div>
+    <div class="s"><label>Gap max (s)</label><input id="gmax" type="number" value="120" min="10"></div>
+    <div class="s"><button class="go" id="send">Send to selected</button></div>
+    <div class="s"><button class="stop" id="stop" disabled>Stop</button></div>
+  </div>
+  <p class="warn hint">⚠ WhatsApp bans personal numbers that send many cold messages fast. Keep it to <b>15–20 new contacts per day</b>, keep the gaps, and always leave the opt-out line in. Already-messaged numbers are skipped automatically.</p>
+  <div class="bar"><i id="fill"></i></div>
+  <div id="sstat" class="mute"></div>
+  <div id="log" class="log"></div>
+</section>
+</main>
+
+<script>
+const $ = id => document.getElementById(id);
+const api = (p, b) => fetch(p, b ? { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(b) } : { method: p.startsWith('/api/wa') || p.startsWith('/api/send') ? 'POST' : 'GET' }).then(r => r.json());
+let leads = [], selected = new Set();
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const render = (t, l) => t.replace(/\{(name|category|address|location|business)\}/g, (_, k) => l[k] ?? '');
+const logTo = (el, line) => { el.hidden = false; el.textContent += line + '\n'; el.scrollTop = el.scrollHeight; };
+
+// ── health / models
+api('/api/health').then(h => {
+  $('model').innerHTML = h.ollama.length ? h.ollama.map(m => `<option>${esc(m)}</option>`).join('') : '<option value="">(Ollama not running)</option>';
+  const pick = h.ollama.find(m => /llama3|qwen|gemma|mistral|phi/i.test(m)); if (pick) $('model').value = pick;
+  $('health').textContent = h.ollama.length ? `local AI: ${h.ollama.length} model(s) via Ollama` : 'local AI off — install Ollama for AI drafts (a plain template still works)';
+  waStatus(h.wa);
+});
+
+// ── step 1
+$('search').onclick = async () => {
+  $('search').disabled = true; $('slog').textContent = ''; $('results').hidden = true;
+  const r = await api('/api/scrape', { business: $('business').value.trim(), location: $('location').value.trim(), cc: $('cc').value.trim(), depth: +$('depth').value, deep: $('deep').checked }).catch(e => ({ error: e.message }));
+  $('search').disabled = false;
+  if (r.error) return logTo($('slog'), '✗ ' + r.error);
+  leads = r.leads; selected = new Set(leads.filter(l => l.phone).map(l => l.phone));
+  drawTable(); $('results').hidden = false; preview();
+};
+function drawTable() {
+  $('tbody').innerHTML = leads.map(l => `<tr>
+    <td>${l.phone ? `<input type="checkbox" data-p="${l.phone}" ${selected.has(l.phone) ? 'checked' : ''}>` : '<span class="mute" title="no phone">–</span>'}</td>
+    <td><b>${esc(l.name)}</b></td><td>${l.phone ? '+' + l.phone : '<span class="mute">no phone</span>'}</td>
+    <td>${l.review_rating ? `${l.review_rating} <span class="mute">(${l.review_count})</span>` : ''}</td><td>${esc(l.category)}</td>
+    <td class="mute">${esc(l.emails || l.website)}</td></tr>`).join('');
+  $('count').textContent = `${leads.length} found · ${leads.filter(l => l.phone).length} with phone · ${selected.size} selected`;
+  $('tbody').querySelectorAll('input').forEach(cb => cb.onchange = () => { cb.checked ? selected.add(cb.dataset.p) : selected.delete(cb.dataset.p); drawTable(); preview(); });
+}
+$('all').onclick = () => { selected = new Set(leads.filter(l => l.phone).map(l => l.phone)); drawTable(); preview(); };
+$('none').onclick = () => { selected.clear(); drawTable(); preview(); };
+
+// ── step 2
+$('draft').onclick = async () => {
+  $('draft').disabled = true; $('dnote').textContent = 'Thinking (local model, 5–30 s)…';
+  const r = await api('/api/draft', { business: $('business').value, location: $('location').value, offer: $('offer').value, sender: $('sender').value, model: $('model').value, lang: $('lang').value });
+  $('draft').disabled = false; $('template').value = r.template; preview();
+  $('dnote').textContent = r.fallback ? `Ollama unavailable (${r.error}) — using a plain template. Edit it below.` : 'Drafted by your local AI. Edit anything you like.';
+};
+function preview() { const l = leads.find(x => selected.has(x.phone)) || { name: 'Bright Walls Painters', category: 'Painter', location: $('location').value, business: $('business').value }; $('preview').textContent = $('template').value ? render($('template').value, l) : '—'; }
+$('template').oninput = preview;
+
+// ── step 3
+function waStatus(s) {
+  const on = s.state === 'connected';
+  $('wapill').textContent = on ? `connected as +${s.user}` : s.state; $('wapill').className = 'pill' + (on ? ' on' : '');
+  if (on) $('qr').innerHTML = '';
+  $('wanote').textContent = (s.note || '') + (s.sentToday ? `  ·  sent today: ${s.sentToday}` : '');
+}
+$('connect').onclick = () => { $('wanote').textContent = 'Connecting…'; api('/api/wa/connect'); };
+$('logout').onclick = () => api('/api/wa/logout');
+
+// ── step 4
+$('send').onclick = async () => {
+  const t = $('template').value;
+  if (!t.includes('{name}')) return alert('The template must contain {name}.');
+  const list = leads.filter(l => selected.has(l.phone));
+  if (!list.length) return alert('Select at least one business with a phone number.');
+  if (!confirm(`Send to up to ${Math.min(list.length, +$('limit').value)} businesses from YOUR WhatsApp number?\n\nFirst message will read:\n\n${render(t, list[0])}`)) return;
+  const r = await api('/api/send', { leads: list, template: t, limit: +$('limit').value, minGap: +$('gmin').value, maxGap: +$('gmax').value });
+  if (r.error) alert(r.error); else { $('send').disabled = true; $('stop').disabled = false; $('log').textContent = ''; }
+};
+$('stop').onclick = () => api('/api/send/stop');
+
+// ── live events
+const es = new EventSource('/api/events');
+es.addEventListener('qr', e => { $('qr').innerHTML = `<img alt="WhatsApp QR code" src="${JSON.parse(e.data).qr}">`; $('wanote').textContent = 'Scan this with WhatsApp → Linked devices. It refreshes every ~20 s.'; });
+es.addEventListener('wa', e => waStatus(JSON.parse(e.data)));
+es.addEventListener('log', e => { const d = JSON.parse(e.data); logTo($('send').disabled ? $('log') : $('slog'), d.line); });
+es.addEventListener('progress', e => {
+  const p = JSON.parse(e.data);
+  $('fill').style.width = p.total ? (100 * p.done / p.total) + '%' : '0';
+  $('sstat').textContent = `${p.sent} sent · ${p.done}/${p.total} processed${p.running ? '' : p.stopped ? ' · stopped' : ' · finished'}`;
+  if (p.last) logTo($('log'), `${p.last.ok ? '✓' : '✗'} ${p.last.name} (+${p.last.phone})${p.last.ok ? '' : ' — ' + p.last.reason}`);
+  if (!p.running) { $('send').disabled = false; $('stop').disabled = true; api('/api/health').then(h => waStatus(h.wa)); }
+});
+</script>
+</body>
+</html>
