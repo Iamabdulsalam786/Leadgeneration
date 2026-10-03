@@ -1,196 +1,3597 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>maps2whatsapp — find businesses, message them on WhatsApp</title>
+<title>maps2whatsapp Pro — Enterprise B2B Lead Extractor & AI Outreach</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root { --bg:#f6f7f9; --card:#fff; --ink:#1a1d23; --mute:#66707f; --line:#e3e6eb; --brand:#128c7e; --brand2:#25d366; --warn:#b4540a; --bad:#b42318; }
-  * { box-sizing:border-box } body { margin:0; font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif; background:var(--bg); color:var(--ink) }
-  header { background:var(--brand); color:#fff; padding:14px 24px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px }
-  header h1 { margin:0; font-size:18px } header small { opacity:.85 }
-  main { max-width:1000px; margin:0 auto; padding:16px; display:grid; gap:16px }
-  section { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:18px 20px }
-  section h2 { margin:0 0 10px; font-size:16px; display:flex; align-items:center; gap:10px }
-  .n { background:var(--brand); color:#fff; width:24px; height:24px; border-radius:50%; display:inline-grid; place-items:center; font-size:13px }
-  .row { display:flex; gap:10px; flex-wrap:wrap; align-items:end } .row > * { flex:1 1 160px } .row > .s { flex:0 1 110px }
-  label { display:block; font-size:12px; color:var(--mute); margin-bottom:3px }
-  input, textarea, select { width:100%; padding:9px 10px; border:1px solid var(--line); border-radius:8px; font:inherit; background:#fff }
-  textarea { min-height:120px; resize:vertical }
-  button { padding:9px 16px; border:0; border-radius:8px; background:var(--brand); color:#fff; font:inherit; font-weight:600; cursor:pointer } button:disabled { opacity:.5; cursor:default }
-  button.ghost { background:#eef1f4; color:var(--ink) } button.go { background:var(--brand2); color:#083b2b } button.stop { background:var(--bad) }
-  table { width:100%; border-collapse:collapse; font-size:14px; margin-top:12px } th, td { text-align:left; padding:7px 8px; border-bottom:1px solid var(--line) } th { color:var(--mute); font-weight:600; font-size:12px }
-  .wrap { overflow-x:auto } .mute { color:var(--mute) } .warn { color:var(--warn) } .bad { color:var(--bad) } .ok { color:var(--brand) }
-  .log { background:#0f1419; color:#cfe3dc; font:12px/1.5 ui-monospace,Menlo,Consolas,monospace; padding:10px; border-radius:8px; max-height:180px; overflow:auto; white-space:pre-wrap; margin-top:10px }
-  .preview { background:#e7fbe9; border-radius:12px 12px 12px 2px; padding:10px 14px; white-space:pre-wrap; margin-top:10px; max-width:420px }
-  .bar { height:8px; background:var(--line); border-radius:4px; overflow:hidden; margin:10px 0 } .bar i { display:block; height:100%; background:var(--brand2); width:0; transition:width .3s }
-  .pill { font-size:12px; padding:2px 8px; border-radius:99px; background:#eef1f4 } .pill.on { background:#d9f7e4; color:#0b6b3a }
-  #qr img { display:block; width:260px; height:260px; border:1px solid var(--line); border-radius:8px; margin:10px 0 }
-  .hint { font-size:12px; color:var(--mute); margin-top:6px }
+  /* ══════════════════════════════════════════════════════════════════════════
+     APPLE & GOOGLE ENTERPRISE DESIGN TOKENS
+     ══════════════════════════════════════════════════════════════════════════ */
+  :root {
+    --font-heading: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+    
+    /* Smooth transitions */
+    --transition-fast: 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+    --transition-normal: 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    --transition-slow: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+
+    /* Radii */
+    --radius-xs: 6px;
+    --radius-sm: 10px;
+    --radius-md: 14px;
+    --radius-lg: 18px;
+    --radius-xl: 24px;
+    --radius-full: 9999px;
+
+    /* Brand Accents */
+    --wa-green: #25d366;
+    --wa-green-hover: #1ebd5a;
+    --wa-teal: #128c7e;
+    --wa-dark-teal: #075e54;
+    --wa-bubble-sent-light: #d9fdd3;
+    --wa-bubble-sent-dark: #005c4b;
+    --wa-chat-bg-light: #efeae2;
+    --wa-chat-bg-dark: #0b141a;
+
+    --brand-primary: #10b981;
+    --brand-primary-hover: #059669;
+    --brand-glow: rgba(16, 185, 129, 0.28);
+    --accent-blue: #3b82f6;
+    --accent-gold: #f59e0b;
+    --accent-gold-glow: rgba(245, 158, 11, 0.25);
+    --accent-rose: #f43f5e;
+    --accent-purple: #8b5cf6;
+  }
+
+  /* DARK THEME (Default: Obsidian Aurora) */
+  html[data-theme="dark"] {
+    --bg-base: #060911;
+    --bg-canvas: #090d16;
+    --bg-mesh: radial-gradient(ellipse 80% 50% at 50% -15%, rgba(16, 185, 129, 0.12), transparent 70%),
+               radial-gradient(ellipse 60% 40% at 90% 10%, rgba(59, 130, 246, 0.1), transparent 60%),
+               radial-gradient(ellipse 60% 40% at 10% 80%, rgba(139, 92, 246, 0.08), transparent 60%);
+    
+    --surface-glass: rgba(13, 19, 33, 0.72);
+    --surface-card: rgba(15, 23, 42, 0.65);
+    --surface-card-solid: #0f172a;
+    --surface-panel: rgba(30, 41, 59, 0.5);
+    --surface-hover: rgba(51, 65, 85, 0.55);
+    --surface-active: rgba(51, 65, 85, 0.85);
+
+    --border-subtle: rgba(255, 255, 255, 0.07);
+    --border-medium: rgba(255, 255, 255, 0.13);
+    --border-strong: rgba(255, 255, 255, 0.22);
+    --border-focus: #10b981;
+
+    --text-primary: #f8fafc;
+    --text-secondary: #cbd5e1;
+    --text-muted: #94a3b8;
+    --text-dim: #64748b;
+
+    --shadow-sm: 0 2px 8px -2px rgba(0, 0, 0, 0.5);
+    --shadow-md: 0 8px 24px -6px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.06);
+    --shadow-lg: 0 20px 48px -12px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.08);
+
+    --input-bg: rgba(15, 23, 42, 0.8);
+    --input-border: rgba(255, 255, 255, 0.12);
+    
+    --wa-bubble-sent: var(--wa-bubble-sent-dark);
+    --wa-chat-bg: var(--wa-chat-bg-dark);
+    --wa-chat-header: #1f2c34;
+    --wa-bubble-text: #e9edef;
+  }
+
+  /* LIGHT THEME (Apple Enterprise Porcelain UI) */
+  html[data-theme="light"] {
+    --bg-base: #f8fafc;
+    --bg-canvas: #f1f5f9;
+    --bg-mesh: radial-gradient(ellipse 80% 50% at 50% -15%, rgba(16, 185, 129, 0.08), transparent 70%),
+               radial-gradient(ellipse 60% 40% at 90% 10%, rgba(59, 130, 246, 0.06), transparent 60%),
+               radial-gradient(ellipse 60% 40% at 10% 80%, rgba(245, 158, 11, 0.05), transparent 60%);
+    
+    --surface-glass: rgba(255, 255, 255, 0.92);
+    --surface-card: #ffffff;
+    --surface-card-solid: #ffffff;
+    --surface-panel: #f8fafc;
+    --surface-hover: #f1f5f9;
+    --surface-active: #e2e8f0;
+
+    --border-subtle: #e2e8f0;
+    --border-medium: #cbd5e1;
+    --border-strong: #94a3b8;
+    --border-focus: #10b981;
+
+    --text-primary: #0f172a;
+    --text-secondary: #334155;
+    --text-muted: #64748b;
+    --text-dim: #94a3b8;
+
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.03);
+    --shadow-md: 0 4px 16px -2px rgba(0, 0, 0, 0.06), 0 2px 6px -1px rgba(0, 0, 0, 0.03);
+    --shadow-lg: 0 16px 36px -8px rgba(0, 0, 0, 0.08), 0 4px 12px -2px rgba(0, 0, 0, 0.04);
+
+    --input-bg: #ffffff;
+    --input-border: #cbd5e1;
+
+    --wa-bubble-sent: #d9fdd3;
+    --wa-chat-bg: #efeae2;
+    --wa-chat-header: #008069;
+    --wa-bubble-text: #111b21;
+  }
+
+  /* Base Reset */
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--font-body);
+    background-color: var(--bg-base);
+    background-image: var(--bg-mesh);
+    background-attachment: fixed;
+    color: var(--text-primary);
+    min-height: 100vh;
+    font-size: 13.5px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+    transition: background-color var(--transition-normal), color var(--transition-normal);
+  }
+
+  /* Custom Clean Scrollbar */
+  ::-webkit-scrollbar { width: 7px; height: 7px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.35); border-radius: 99px; }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(148, 163, 184, 0.6); }
+
+  /* ══════════════════════════════════════════════════════════════════════════
+     HEADER & GLOBAL NAVIGATION
+     ══════════════════════════════════════════════════════════════════════════ */
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: var(--surface-glass);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border-bottom: 1px solid var(--border-subtle);
+    padding: 10px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    box-shadow: var(--shadow-sm);
+    transition: all var(--transition-normal);
+  }
+
+  .brand-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+  }
+
+  .brand-logo-badge {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #10b981 0%, #3b82f6 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 16px var(--brand-glow);
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .brand-logo-badge::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.3) 0%, transparent 60%);
+    border-radius: inherit;
+  }
+
+  .brand-title-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .brand-name {
+    font-family: var(--font-heading);
+    font-size: 17.5px;
+    font-weight: 800;
+    letter-spacing: -0.4px;
+    color: var(--text-primary);
+  }
+
+  .brand-accent {
+    color: var(--brand-primary);
+    background: linear-gradient(135deg, #10b981, #3b82f6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .brand-badge-pro {
+    font-size: 9.5px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    padding: 2px 7px;
+    border-radius: 6px;
+    background: rgba(16, 185, 129, 0.12);
+    color: #10b981;
+    border: 1px solid rgba(16, 185, 129, 0.28);
+    box-shadow: 0 1px 4px rgba(16, 185, 129, 0.1);
+  }
+
+  .brand-subtitle {
+    font-size: 11.5px;
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  /* Status Pills */
+  .status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    border-radius: var(--radius-full);
+    font-size: 12px;
+    font-weight: 600;
+    background: var(--surface-card);
+    border: 1px solid var(--border-subtle);
+    color: var(--text-secondary);
+    box-shadow: var(--shadow-sm);
+    transition: all var(--transition-fast);
+    white-space: nowrap;
+  }
+
+  .status-pill.clickable {
+    cursor: pointer;
+  }
+
+  .status-pill.clickable:hover {
+    background: var(--surface-hover);
+    border-color: var(--border-medium);
+    transform: translateY(-1px);
+    color: var(--text-primary);
+  }
+
+  .status-pill.online {
+    background: rgba(16, 185, 129, 0.12);
+    border-color: rgba(16, 185, 129, 0.35);
+    color: #10b981;
+  }
+
+  .pulse-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--text-dim);
+    position: relative;
+  }
+
+  .pulse-dot.online {
+    background: #10b981;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.3);
+    animation: pulseGlow 2s infinite;
+  }
+
+  .pulse-dot.warning {
+    background: #f59e0b;
+    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.3);
+    animation: pulseGlow 2s infinite;
+  }
+
+  @keyframes pulseGlow {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.65; transform: scale(1.15); }
+  }
+
+  /* Theme Switcher Button */
+  .theme-toggle-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: var(--surface-card);
+    border: 1px solid var(--border-subtle);
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 15px;
+    transition: all var(--transition-fast);
+  }
+
+  .theme-toggle-btn:hover {
+    background: var(--surface-hover);
+    color: var(--text-primary);
+    border-color: var(--border-medium);
+    transform: translateY(-1px);
+  }
+
+  /* ══════════════════════════════════════════════════════════════════════════
+     LIVE CURRENCY ARBITRAGE TICKER TAPE
+     ══════════════════════════════════════════════════════════════════════════ */
+  .currency-ticker-wrap {
+    background: var(--surface-glass);
+    border-bottom: 1px solid var(--border-subtle);
+    padding: 7px 24px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-size: 11.5px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    box-shadow: inset 0 -1px 0 var(--border-subtle);
+  }
+  .currency-ticker-wrap::-webkit-scrollbar { display: none; }
+
+  .ticker-heading {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--accent-gold);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    flex-shrink: 0;
+    padding-right: 6px;
+    border-right: 1px solid var(--border-subtle);
+  }
+
+  .ticker-scroll {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: nowrap;
+  }
+
+  .ticker-card {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: var(--radius-xs);
+    background: var(--surface-card);
+    border: 1px solid var(--border-subtle);
+    color: var(--text-secondary);
+    font-size: 11.5px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all var(--transition-fast);
+  }
+
+  .ticker-card:hover {
+    background: var(--surface-hover);
+    border-color: var(--brand-primary);
+    color: var(--text-primary);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.15);
+  }
+
+  .ticker-card .rate-val {
+    font-family: var(--font-mono);
+    font-weight: 700;
+    color: var(--brand-primary);
+  }
+
+  /* ══════════════════════════════════════════════════════════════════════════
+     WORKFLOW STEPPER NAVIGATION (Apple Segmented Bar)
+     ══════════════════════════════════════════════════════════════════════════ */
+  .workflow-stepper {
+    max-width: 1240px;
+    margin: 18px auto 0;
+    padding: 0 24px;
+  }
+
+  .stepper-nav {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    background: var(--surface-card);
+    padding: 6px;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-subtle);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .step-tab {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    border-radius: var(--radius-md);
+    background: transparent;
+    border: 1px solid transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    user-select: none;
+    position: relative;
+  }
+
+  .step-tab:hover {
+    background: var(--surface-hover);
+    color: var(--text-primary);
+  }
+
+  .step-tab.active {
+    background: rgba(16, 185, 129, 0.12);
+    border-color: rgba(16, 185, 129, 0.35);
+    color: var(--text-primary);
+    box-shadow: 0 2px 10px rgba(16, 185, 129, 0.12);
+  }
+
+  .step-tab-badge {
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+    display: grid;
+    place-items: center;
+    font-weight: 800;
+    font-size: 13px;
+    background: var(--surface-panel);
+    border: 1px solid var(--border-subtle);
+    color: var(--text-muted);
+    flex-shrink: 0;
+    transition: all var(--transition-fast);
+  }
+
+  .step-tab.active .step-tab-badge {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    border-color: transparent;
+    color: #ffffff;
+    box-shadow: 0 2px 10px rgba(16, 185, 129, 0.4);
+  }
+
+  .step-tab-title {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 13px;
+    white-space: nowrap;
+    letter-spacing: -0.2px;
+  }
+
+  .step-tab-sub {
+    font-size: 11px;
+    color: var(--text-dim);
+    white-space: nowrap;
+    margin-top: 1px;
+  }
+
+  .step-tab.active .step-tab-sub {
+    color: var(--brand-primary);
+    font-weight: 600;
+  }
+
+  /* ══════════════════════════════════════════════════════════════════════════
+     MAIN CONTAINER & SECTIONS
+     ══════════════════════════════════════════════════════════════════════════ */
+  main {
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 20px 24px 80px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .app-section {
+    background: var(--surface-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-xl);
+    padding: 28px 30px;
+    box-shadow: var(--shadow-md);
+    position: relative;
+    backdrop-filter: blur(16px);
+    transition: all var(--transition-normal);
+  }
+
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 24px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  .section-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .section-icon-badge {
+    width: 44px;
+    height: 44px;
+    border-radius: 13px;
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(59, 130, 246, 0.15));
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    box-shadow: var(--shadow-sm);
+    flex-shrink: 0;
+  }
+
+  .section-title {
+    font-family: var(--font-heading);
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: -0.3px;
+    color: var(--text-primary);
+  }
+
+  .section-desc {
+    color: var(--text-muted);
+    font-size: 12.5px;
+    margin-top: 3px;
+  }
+
+  /* Card Panels */
+  .card-panel {
+    background: var(--surface-panel);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    padding: 20px 22px;
+    margin-bottom: 18px;
+    box-shadow: var(--shadow-sm);
+    transition: border-color var(--transition-fast);
+  }
+
+  .card-panel:hover {
+    border-color: var(--border-medium);
+  }
+
+  .card-panel-title {
+    font-family: var(--font-heading);
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .card-panel-title-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* Grid Layouts */
+  .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 16px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+
+  /* Input Controls */
+  .field-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+  }
+
+  label {
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .field-hint {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-muted);
+  }
+
+  select {
+    width: 100%;
+    padding: 10px 36px 10px 14px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--input-border);
+    background-color: var(--input-bg);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    background-size: 15px;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    color: var(--text-primary);
+    font-family: inherit;
+    font-size: 13.5px;
+    font-weight: 500;
+    outline: none;
+    transition: all var(--transition-fast);
+    cursor: pointer;
+    box-shadow: var(--shadow-sm);
+  }
+
+  select:hover {
+    border-color: var(--border-medium);
+  }
+
+  select:focus {
+    border-color: var(--brand-primary);
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+  }
+
+  input[type="text"], input[type="number"], textarea {
+    width: 100%;
+    padding: 10px 14px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--input-border);
+    background: var(--input-bg);
+    color: var(--text-primary);
+    font-family: inherit;
+    font-size: 13.5px;
+    outline: none;
+    transition: all var(--transition-fast);
+    box-shadow: var(--shadow-sm);
+  }
+
+  input:hover, textarea:hover {
+    border-color: var(--border-medium);
+  }
+
+  input:focus, textarea:focus {
+    border-color: var(--brand-primary);
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+  }
+
+  textarea {
+    resize: vertical;
+    min-height: 120px;
+    line-height: 1.6;
+  }
+
+  /* Buttons */
+  button {
+    padding: 9px 18px;
+    border-radius: var(--radius-sm);
+    font-family: var(--font-heading);
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all var(--transition-fast);
+    user-select: none;
+  }
+
+  button:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+  }
+  button:active:not(:disabled) {
+    transform: translateY(0);
+  }
+  button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  button.primary {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: #ffffff;
+    box-shadow: 0 4px 14px var(--brand-glow);
+  }
+  button.primary:hover:not(:disabled) {
+    background: linear-gradient(135deg, #059669 0%, #047857 100%);
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.45);
+  }
+
+  button.action-green {
+    background: linear-gradient(135deg, #25d366 0%, #128c7e 100%);
+    color: #ffffff;
+    box-shadow: 0 4px 14px rgba(37, 211, 102, 0.35);
+  }
+
+  button.ghost {
+    background: var(--surface-card);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-medium);
+    box-shadow: var(--shadow-sm);
+  }
+  button.ghost:hover:not(:disabled) {
+    background: var(--surface-hover);
+    border-color: var(--border-strong);
+    color: var(--text-primary);
+  }
+
+  button.danger {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: #ffffff;
+    box-shadow: 0 4px 14px rgba(239, 68, 68, 0.35);
+  }
+
+  /* Trending Chips / Quick Niche Pills */
+  .quick-chips-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin-top: 10px;
+  }
+
+  .quick-chip {
+    padding: 6px 12px;
+    border-radius: var(--radius-xs);
+    background: var(--surface-card);
+    border: 1px solid var(--border-subtle);
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    user-select: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .quick-chip:hover {
+    background: var(--surface-hover);
+    color: var(--text-primary);
+    border-color: var(--brand-primary);
+    transform: translateY(-1px);
+  }
+
+  .quick-chip.active {
+    background: rgba(16, 185, 129, 0.15);
+    border-color: var(--brand-primary);
+    color: #10b981;
+    font-weight: 700;
+    box-shadow: 0 1px 6px rgba(16, 185, 129, 0.2);
+  }
+
+  /* Live Instant Niche Search Input */
+  .niche-filter-bar {
+    position: relative;
+  }
+  .niche-filter-bar input {
+    padding-left: 38px;
+    background: var(--input-bg);
+    border-color: var(--input-border);
+    font-size: 13px;
+  }
+  .niche-filter-bar span {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+  }
+  .niche-filter-results {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+    max-height: 120px;
+    overflow-y: auto;
+    padding: 8px;
+    background: var(--surface-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-sm);
+  }
+
+  /* Arbitrage ROI Banner Card */
+  .arbitrage-card {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(59, 130, 246, 0.08) 100%);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    border-radius: var(--radius-md);
+    padding: 14px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-top: 16px;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .arb-info {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .arb-flag-icon { font-size: 28px; line-height: 1; }
+  .arb-titles h3 { font-family: var(--font-heading); font-size: 14px; font-weight: 800; color: var(--text-primary); }
+  .arb-titles p { font-size: 11.5px; color: var(--text-muted); margin-top: 2px; }
+
+  .arb-pill-badge {
+    background: var(--surface-card);
+    border: 1px solid rgba(16, 185, 129, 0.4);
+    padding: 7px 16px;
+    border-radius: var(--radius-full);
+    font-size: 12.5px;
+    font-weight: 800;
+    color: #10b981;
+    box-shadow: 0 2px 10px rgba(16, 185, 129, 0.15);
+  }
+
+  /* Goldmine Toggle Card */
+  .goldmine-toggle-card {
+    background: rgba(245, 158, 11, 0.08);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    border-radius: var(--radius-md);
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin: 16px 0;
+  }
+
+  .toggle-details {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .custom-switch {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 24px;
+    flex-shrink: 0;
+  }
+
+  .custom-switch input { opacity: 0; width: 0; height: 0; }
+  .slider {
+    position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+    background-color: var(--surface-active); transition: .25s cubic-bezier(0.16, 1, 0.3, 1); border-radius: 34px;
+    border: 1px solid var(--border-medium);
+  }
+  .slider:before {
+    position: absolute; content: ""; height: 18px; width: 18px; left: 2px; bottom: 2px;
+    background-color: #ffffff; transition: .25s cubic-bezier(0.16, 1, 0.3, 1); border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  }
+  input:checked + .slider { background-color: var(--accent-gold); border-color: transparent; }
+  input:checked + .slider:before { transform: translateX(20px); }
+
+  .toggle-details-text b { color: var(--accent-gold); font-size: 13.5px; font-weight: 700; }
+  .toggle-details-text p { font-size: 11.5px; color: var(--text-muted); margin-top: 2px; }
+
+  /* ══════════════════════════════════════════════════════════════════════════
+     STEP 2: KPI GRID, FILTER TOOLBAR & TABLE
+     ══════════════════════════════════════════════════════════════════════════ */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 14px;
+    margin-bottom: 22px;
+  }
+
+  .kpi-card {
+    background: var(--surface-panel);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: 16px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    box-shadow: var(--shadow-sm);
+    border-top: 3.5px solid var(--border-medium);
+    transition: transform var(--transition-fast);
+  }
+
+  .kpi-card:hover { transform: translateY(-1px); }
+  .kpi-card:nth-child(1) { border-top-color: var(--accent-blue); }
+  .kpi-card:nth-child(2) { border-top-color: var(--accent-gold); }
+  .kpi-card:nth-child(3) { border-top-color: var(--brand-primary); }
+  .kpi-card:nth-child(4) { border-top-color: var(--accent-purple); }
+
+  .kpi-label { font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.6px; }
+  .kpi-value { font-size: 26px; font-weight: 800; font-family: var(--font-mono); color: var(--text-primary); }
+
+  .table-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .filter-tabs-group {
+    display: flex;
+    flex-wrap: wrap;
+    background: var(--surface-panel);
+    border: 1px solid var(--border-subtle);
+    padding: 4px;
+    border-radius: var(--radius-sm);
+    gap: 4px;
+  }
+
+  .filter-pill {
+    padding: 6px 14px;
+    border-radius: var(--radius-xs);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+  }
+
+  .filter-pill:hover { color: var(--text-primary); background: var(--surface-hover); }
+  .filter-pill.active { background: var(--surface-card); color: var(--text-primary); font-weight: 700; box-shadow: var(--shadow-sm); }
+  .filter-pill.gold-active { background: rgba(245, 158, 11, 0.15); color: var(--accent-gold); font-weight: 700; box-shadow: 0 1px 4px rgba(245, 158, 11, 0.2); }
+
+  .table-container {
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    background: var(--surface-panel);
+    overflow-x: auto;
+    box-shadow: var(--shadow-sm);
+  }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13px; text-align: left; }
+  thead th {
+    background: var(--surface-card);
+    padding: 12px 16px;
+    font-weight: 800;
+    font-size: 11px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    border-bottom: 1.5px solid var(--border-subtle);
+    white-space: nowrap;
+  }
+
+  tbody td {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border-subtle);
+    vertical-align: middle;
+    color: var(--text-secondary);
+  }
+
+  tbody tr:hover { background: var(--surface-hover); }
+
+  /* Badges */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 10px;
+    border-radius: var(--radius-full);
+    font-size: 11px;
+    font-weight: 700;
+  }
+  .badge-no-web { background: rgba(245, 158, 11, 0.12); color: var(--accent-gold); border: 1px solid rgba(245, 158, 11, 0.3); }
+  .badge-has-web { background: rgba(59, 130, 246, 0.12); color: var(--accent-blue); border: 1px solid rgba(59, 130, 246, 0.3); }
+  .badge-wa-ok { background: rgba(16, 185, 129, 0.12); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); }
+  .badge-wa-no { background: rgba(244, 63, 94, 0.12); color: var(--accent-rose); border: 1px solid rgba(244, 63, 94, 0.3); }
+
+  .wa-quick-link {
+    color: #10b981;
+    text-decoration: none;
+    font-size: 11.5px;
+    margin-left: 6px;
+    padding: 2px 7px;
+    border-radius: var(--radius-xs);
+    background: rgba(16, 185, 129, 0.12);
+    border: 1px solid rgba(16, 185, 129, 0.25);
+    font-weight: 600;
+    transition: all var(--transition-fast);
+  }
+  .wa-quick-link:hover { background: rgba(16, 185, 129, 0.22); text-decoration: none; }
+
+  /* ══════════════════════════════════════════════════════════════════════════
+     STEP 3: PITCH STUDIO & AUTHENTIC IPHONE MOCKUP
+     ══════════════════════════════════════════════════════════════════════════ */
+  .composer-layout {
+    display: grid;
+    grid-template-columns: 1.22fr 0.78fr;
+    gap: 26px;
+    align-items: start;
+  }
+
+  @media (max-width: 960px) { .composer-layout { grid-template-columns: 1fr; } }
+
+  /* Preset Angle Cards */
+  .preset-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .preset-card {
+    background: var(--surface-panel);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-sm);
+    padding: 11px 14px;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+  }
+
+  .preset-card:hover { border-color: var(--border-medium); background: var(--surface-hover); }
+  .preset-card.active { background: rgba(16, 185, 129, 0.12); border-color: var(--brand-primary); box-shadow: 0 2px 10px rgba(16, 185, 129, 0.15); }
+  .preset-card-title { font-size: 12px; font-weight: 800; color: var(--text-primary); }
+  .preset-card.active .preset-card-title { color: #10b981; }
+  .preset-card-desc { font-size: 10.5px; color: var(--text-muted); margin-top: 2px; }
+
+  /* Tag pills */
+  .tag-pills-bar { display: flex; flex-wrap: wrap; gap: 7px; margin: 8px 0 12px; }
+  .tag-pill {
+    padding: 4px 10px;
+    border-radius: var(--radius-xs);
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid rgba(16, 185, 129, 0.25);
+    font-size: 11.5px;
+    font-family: var(--font-mono);
+    font-weight: 600;
+    color: #10b981;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+  }
+  .tag-pill:hover { background: rgba(16, 185, 129, 0.2); border-color: var(--brand-primary); transform: translateY(-1px); }
+
+  /* Phone Mockup */
+  .phone-mockup-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .phone-frame {
+    width: 100%;
+    max-width: 325px;
+    background: var(--wa-chat-bg);
+    border-radius: 36px;
+    border: 5px solid #334155;
+    box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.08);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+
+  .phone-top-notch {
+    height: 24px;
+    background: var(--wa-chat-header);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 18px;
+    font-size: 10.5px;
+    color: #ffffff;
+    font-weight: 600;
+  }
+  .phone-notch-island { width: 55px; height: 11px; background: rgba(0,0,0,0.3); border-radius: 8px; }
+
+  .wa-chat-header {
+    background: var(--wa-chat-header);
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #ffffff;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+  }
+
+  .wa-avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    display: grid;
+    place-items: center;
+    font-size: 15px;
+    color: #ffffff;
+    font-weight: 800;
+    flex-shrink: 0;
+  }
+
+  .wa-chat-info { flex: 1; overflow: hidden; }
+  .wa-chat-name { font-weight: 700; font-size: 13px; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .wa-chat-status { font-size: 10.5px; color: rgba(255, 255, 255, 0.8); }
+
+  .wa-chat-body {
+    background-color: var(--wa-chat-bg);
+    background-image: radial-gradient(rgba(148, 163, 184, 0.15) 1.2px, transparent 1.2px);
+    background-size: 14px 14px;
+    padding: 14px 12px;
+    min-height: 230px;
+    max-height: 290px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+  }
+
+  .wa-bubble-sent {
+    background: var(--wa-bubble-sent);
+    color: var(--wa-bubble-text);
+    padding: 9px 13px 18px;
+    border-radius: 10px 0 10px 10px;
+    font-size: 12.5px;
+    line-height: 1.45;
+    position: relative;
+    max-width: 92%;
+    margin-left: auto;
+    white-space: pre-wrap;
+    word-break: break-word;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  }
+
+  .wa-bubble-meta {
+    position: absolute;
+    bottom: 3px;
+    right: 7px;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 9.5px;
+    color: rgba(148, 163, 184, 0.85);
+  }
+
+  .wa-ticks { color: #53bdeb; font-weight: bold; font-size: 11px; }
+
+  .wa-chat-footer {
+    background: var(--wa-chat-header);
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 12px;
+  }
+
+  .wa-input-fake { flex: 1; background: rgba(255, 255, 255, 0.15); border-radius: 18px; padding: 5px 12px; color: rgba(255, 255, 255, 0.6); font-size: 11.5px; }
+
+  /* ══════════════════════════════════════════════════════════════════════════
+     STEP 4: WHATSAPP CONNECTION & ANTI-BAN DISPATCH
+     ══════════════════════════════════════════════════════════════════════════ */
+  .wa-connection-card {
+    background: var(--surface-panel);
+    border: 1px solid var(--border-subtle);
+    border-left: 5px solid #25d366;
+    border-radius: var(--radius-md);
+    padding: 22px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .wa-conn-left { display: flex; align-items: center; gap: 16px; }
+  .wa-conn-logo {
+    width: 48px;
+    height: 48px;
+    border-radius: 13px;
+    background: linear-gradient(135deg, #25d366, #128c7e);
+    display: grid;
+    place-items: center;
+    font-size: 24px;
+    box-shadow: 0 4px 14px rgba(37, 211, 102, 0.35);
+  }
+
+  .qr-code-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #ffffff;
+    padding: 18px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-subtle);
+    box-shadow: var(--shadow-md);
+    margin: 16px 0;
+  }
+
+  .sending-dashboard {
+    background: var(--surface-panel);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: 22px;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .progress-wrap { margin: 18px 0 10px; }
+  .progress-bar-bg { height: 9px; background: var(--surface-hover); border-radius: 99px; overflow: hidden; }
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #10b981, #3b82f6);
+    width: 0%;
+    transition: width 0.3s ease;
+  }
+
+  .progress-status-text {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 7px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+  }
+
+  /* Terminal Console */
+  .terminal-box {
+    background: #060911;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-sm);
+    padding: 14px 18px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: #7dd3fc;
+    height: 150px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    line-height: 1.6;
+    margin-top: 12px;
+    box-shadow: inset 0 2px 6px rgba(0,0,0,0.5);
+  }
+
+  .terminal-line-success { color: #34d399; }
+  .terminal-line-warn { color: #fbbf24; }
+  .terminal-line-error { color: #f87171; }
+  .terminal-line-info { color: #38bdf8; }
+
+  /* Floating Toast System */
+  .toast-container {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    pointer-events: none;
+  }
+
+  .toast {
+    background: var(--surface-card-solid);
+    border: 1px solid var(--border-medium);
+    border-radius: var(--radius-sm);
+    padding: 11px 18px;
+    color: var(--text-primary);
+    font-size: 12.5px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: var(--shadow-lg);
+    pointer-events: auto;
+    animation: toastIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .toast.success { border-color: rgba(16, 185, 129, 0.6); }
+  .toast.error { border-color: rgba(244, 63, 94, 0.6); }
+  .toast.warning { border-color: rgba(245, 158, 11, 0.6); }
+
+  @keyframes toastIn {
+    from { opacity: 0; transform: translateY(12px) scale(0.96); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  .step-continue-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 24px;
+    padding-top: 18px;
+    border-top: 1px solid var(--border-subtle);
+  }
+
+  .custom-link {
+    font-size: 11.5px;
+    color: var(--brand-primary);
+    cursor: pointer;
+    text-decoration: underline;
+    margin-top: 4px;
+    display: inline-block;
+    font-weight: 600;
+  }
+
+  @media (max-width: 768px) {
+    .stepper-nav { grid-template-columns: repeat(2, 1fr); }
+    .app-section { padding: 20px 16px; }
+    header { padding: 10px 16px; }
+  }
 </style>
 </head>
 <body>
-<header><h1>maps2whatsapp</h1><small id="health">checking local AI…</small></header>
+
+<!-- Header with Maps2WhatsApp Enterprise Branding -->
+<header>
+  <div class="brand-group" onclick="switchStep(1)">
+    <div class="brand-logo-badge">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+        <path d="M12 2C7.58 2 4 5.58 4 10C4 15.25 12 22 12 22C12 22 20 15.25 20 10C20 5.58 16.42 2 12 2Z" fill="#ffffff" fill-opacity="0.95"/>
+        <circle cx="12" cy="9.5" r="3" fill="#10b981"/>
+        <path d="M17.5 13C17.5 15.5 15.5 17.5 13 17.5C12.2 17.5 11.5 17.3 10.8 16.9L8.5 17.5L9.1 15.3C8.7 14.6 8.5 13.8 8.5 13C8.5 10.5 10.5 8.5 13 8.5C15.5 8.5 17.5 10.5 17.5 13Z" fill="#ffffff" stroke="#10b981" stroke-width="1.2"/>
+      </svg>
+    </div>
+    <div class="brand-text">
+      <div class="brand-title-row">
+        <span class="brand-name">maps<span class="brand-accent">2</span>whatsapp</span>
+        <span class="brand-badge-pro">PRO 2.0</span>
+      </div>
+      <p class="brand-subtitle">Google Maps Lead Extractor &amp; Local AI WhatsApp Outreach</p>
+    </div>
+  </div>
+
+  <div class="header-actions">
+    <div class="status-pill clickable" id="waHeaderPill" onclick="switchStep(4)" title="Click to view WhatsApp Connection">
+      <span class="pulse-dot" id="waHeaderDot"></span>
+      <span id="waHeaderText">WhatsApp: Checking…</span>
+    </div>
+    <div class="status-pill">
+      <span class="pulse-dot online"></span>
+      <span id="health">AI Ready</span>
+    </div>
+    <button class="theme-toggle-btn" id="themeToggleBtn" title="Toggle Dark/Light Mode">
+      <span id="themeIcon">🌙</span>
+    </button>
+  </div>
+</header>
+
+<!-- Live Currency Exchange Rates Ticker Bar -->
+<div class="currency-ticker-wrap">
+  <div class="ticker-heading">⚡ LIVE FX (Rates to PKR):</div>
+  <div class="ticker-scroll" id="tickerItems">Loading live exchange rates…</div>
+</div>
+
+<!-- Workflow Stepper Tabs -->
+<div class="workflow-stepper">
+  <div class="stepper-nav">
+    <div class="step-tab active" id="tabStep1" onclick="switchStep(1)">
+      <div class="step-tab-badge">1</div>
+      <div>
+        <div class="step-tab-title">1. Discovery &amp; Niches</div>
+        <div class="step-tab-sub">Country, Niche &amp; Towns</div>
+      </div>
+    </div>
+    <div class="step-tab" id="tabStep2" onclick="switchStep(2)">
+      <div class="step-tab-badge">2</div>
+      <div>
+        <div class="step-tab-title">2. Prospects Studio</div>
+        <div class="step-tab-sub" id="prospectsTabSub">0 Leads Found</div>
+      </div>
+    </div>
+    <div class="step-tab" id="tabStep3" onclick="switchStep(3)">
+      <div class="step-tab-badge">3</div>
+      <div>
+        <div class="step-tab-title">3. Pitch &amp; Preview</div>
+        <div class="step-tab-sub">AI WhatsApp Studio</div>
+      </div>
+    </div>
+    <div class="step-tab" id="tabStep4" onclick="switchStep(4)">
+      <div class="step-tab-badge">4</div>
+      <div>
+        <div class="step-tab-title">4. WhatsApp &amp; Send</div>
+        <div class="step-tab-sub" id="waTabSub">Safe Dispatcher</div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <main>
 
-<section id="s1">
-  <h2><span class="n">1</span> Find businesses</h2>
-  <div class="row">
-    <div><label>Business type</label><input id="business" placeholder="painters, construction companies, camera shops…"></div>
-    <div><label>Location</label><input id="location" placeholder="Lahore, Pakistan"></div>
-    <div class="s"><label>Country code</label><input id="cc" value="92" title="Used only for numbers that lack a + prefix"></div>
-    <div class="s"><label>How many</label><select id="depth"><option value="1">~20</option><option value="2" selected>~40</option><option value="3">~60</option><option value="5">~100</option></select></div>
-    <div class="s"><label><input type="checkbox" id="deep" style="width:auto"> Also find emails</label><span class="hint">slower, downloads a browser once</span></div>
-    <div class="s"><button id="search">Search</button></div>
+<!-- STEP 1: Search Leads with Structured Dropdowns -->
+<section class="app-section" id="sectionStep1">
+  <div class="section-header">
+    <div class="section-title-wrap">
+      <div class="section-icon-badge">🎯</div>
+      <div>
+        <h2 class="section-title">Select Target Market, Suburbs &amp; Business Niche</h2>
+        <p class="section-desc">Search affluent suburbs in high-currency economies where local businesses lack modern websites.</p>
+      </div>
+    </div>
+    <div id="activeMarketBadge" class="badge badge-wa-ok" style="font-size:12px;padding:6px 14px">
+      🇬🇧 United Kingdom Selected
+    </div>
   </div>
-  <div id="slog" class="log" hidden></div>
-  <div id="results" hidden>
-    <div class="row" style="margin-top:12px;align-items:center"><span id="count" class="mute"></span><span style="flex:0"><button class="ghost" id="all">Select all</button></span><span style="flex:0"><button class="ghost" id="none">None</button></span><span style="flex:0"><a href="/api/export.csv"><button class="ghost">Download CSV</button></a></span></div>
-    <div class="wrap"><table><thead><tr><th></th><th>Business</th><th>Phone</th><th>Rating</th><th>Category</th><th>Website / email</th></tr></thead><tbody id="tbody"></tbody></table></div>
+
+  <!-- Group 1: Location Targeting Dropdowns -->
+  <div class="card-panel">
+    <div class="card-panel-title">
+      <div class="card-panel-title-left">
+        <span>📍</span>
+        <span>1. Geographical Market &amp; Wealthy Suburbs</span>
+      </div>
+      <span class="field-hint">Filtered for high purchasing power</span>
+    </div>
+
+    <div class="grid-3">
+      <div class="field-wrap">
+        <label for="countrySelect">Target Country &amp; Currency <span class="field-hint">Auto dial code</span></label>
+        <select id="countrySelect"></select>
+      </div>
+      <div class="field-wrap">
+        <label for="regionSelect">State / Wealthy County <span class="field-hint">Top GDP areas</span></label>
+        <select id="regionSelect"></select>
+      </div>
+      <div class="field-wrap">
+        <label for="citySelect">Affluent Town / Suburb <span class="field-hint">Direct search area</span></label>
+        <select id="citySelect"></select>
+        <div id="customCityWrap" style="display:none;margin-top:6px">
+          <input id="customCityInput" type="text" placeholder="Type custom town e.g. Guildford, Surrey, UK">
+        </div>
+        <span class="custom-link" id="toggleCustomCity">Or type custom city/town</span>
+      </div>
+    </div>
+
+    <!-- Arbitrage Deal Value -->
+    <div class="arbitrage-card">
+      <div class="arb-info">
+        <div class="arb-flag-icon" id="arbFlag">🇬🇧</div>
+        <div class="arb-titles">
+          <h3 id="arbCountryTitle">United Kingdom (GBP £)</h3>
+          <p id="arbRateSub">1 GBP ≈ 366.0 PKR · Elite Arbitrage Market</p>
+        </div>
+      </div>
+      <div class="arb-pill-badge" id="arbRoiPill">
+        💎 Recommended Deal: £250 = ₨ 91,500 PKR
+      </div>
+    </div>
+  </div>
+
+  <!-- Group 2: Niche & Industry Selection Dropdowns -->
+  <div class="card-panel">
+    <div class="card-panel-title">
+      <div class="card-panel-title-left">
+        <span>💼</span>
+        <span>2. Industry Category &amp; Micro-Niches</span>
+      </div>
+      <span class="field-hint">Select via dropdown or quick preset</span>
+    </div>
+
+    <!-- Quick Presets Dropdown & Instant Search Row -->
+    <div class="grid-2" style="margin-bottom:14px">
+      <div class="field-wrap">
+        <label for="quickPresetSelect">
+          <span>⚡ Quick High-Converting Preset</span>
+          <span class="field-hint">1-Click popular niches</span>
+        </label>
+        <select id="quickPresetSelect">
+          <option value="">-- ⚡ Top High-Converting High-Ticket Niches --</option>
+          <option value="0,0">🔨 Emergency Plumbers &amp; Drain Unblocking</option>
+          <option value="1,0">🏠 Roof Replacement &amp; Re-Roofing</option>
+          <option value="2,1">☀️ Solar Panel Installation &amp; Inverters</option>
+          <option value="28,1">🛋️ Custom Fitted Wardrobes &amp; Cabinet Makers</option>
+          <option value="29,0">🏊 Bespoke Swimming Pool Builders &amp; Spas</option>
+          <option value="32,1">💎 Swiss Watch Servicing &amp; Rolex Repair</option>
+          <option value="33,0">🌿 Air Source Heat Pumps &amp; Battery Storage</option>
+          <option value="34,0">❄️ Commercial Refrigeration &amp; Cold Rooms</option>
+          <option value="35,0">✈️ Executive Airport Transfer Chauffeurs</option>
+          <option value="36,1">🩺 Private Podiatrists &amp; Microsuction</option>
+          <option value="30,0">🛥️ Mobile Marine Engineers &amp; Yacht Repair</option>
+          <option value="31,0">🏗️ Mini Digger Hire &amp; Groundworks</option>
+          <option value="9,0">🦷 Cosmetic Dentists (Smile Makeovers)</option>
+          <option value="10,0">💉 Botox &amp; Dermal Fillers Clinics</option>
+          <option value="13,0">🚗 Ceramic Coating &amp; Paint Correction</option>
+          <option value="14,0">🏎️ Mobile Mechanics (On-site)</option>
+          <option value="15,1">💦 Driveway Pressure Washing</option>
+          <option value="17,0">🐕 Mobile Dog Groomers &amp; Pet Spas</option>
+          <option value="5,0">🍳 Bespoke Kitchen Fitters &amp; Designers</option>
+          <option value="3,0">🌳 Tree Surgeons &amp; Arborists</option>
+          <option value="18,0">💍 Wedding Photographers</option>
+          <option value="21,2">⚖️ Immigration &amp; Visa Solicitors</option>
+          <option value="16,0">📦 House Removals &amp; Storage</option>
+          <option value="7,0">🔑 Emergency 24/7 Locksmiths</option>
+          <option value="20,1">💪 Reformer Pilates &amp; Fitness</option>
+        </select>
+      </div>
+
+      <div class="field-wrap">
+        <label for="nicheKeywordFilter">
+          <span>🔍 Instant Search 450+ Niches</span>
+          <span class="field-hint">Type any keyword</span>
+        </label>
+        <div class="niche-filter-bar">
+          <span>🔎</span>
+          <input type="text" id="nicheKeywordFilter" placeholder="e.g. plumber, dental, solar, cleaner, dog, roof...">
+        </div>
+      </div>
+    </div>
+
+    <div id="filteredNichesBox" class="niche-filter-results" style="display:none"></div>
+
+    <!-- Cascading Sector & Micro-Niche Dropdowns -->
+    <div class="grid-2">
+      <div class="field-wrap">
+        <label for="sectorSelect">
+          <span>High-Ticket Industry Category</span>
+          <span class="field-hint" id="sectorCountBadge">28 Categories</span>
+        </label>
+        <select id="sectorSelect"></select>
+      </div>
+      <div class="field-wrap">
+        <label for="nicheSelect">
+          <span>Specific Micro-Niche (450+ Total)</span>
+          <span style="font-size:11.5px;color:#10b981;font-weight:700" id="nicheCountBadge">15 niches</span>
+        </label>
+        <select id="nicheSelect"></select>
+        <div id="customNicheWrap" style="display:none;margin-top:6px">
+          <input id="customNicheInput" type="text" placeholder="Type custom niche e.g. Emergency Plumbers">
+        </div>
+        <span class="custom-link" id="toggleCustomNiche">Or type custom micro-niche</span>
+      </div>
+    </div>
+
+    <!-- Quick Chips Strip for Fast Selection -->
+    <div style="margin-top:14px">
+      <div style="font-size:11.5px;font-weight:700;color:var(--text-muted);margin-bottom:6px">Popular Shortcuts:</div>
+      <div class="quick-chips-wrap" id="quickPicksTrack">
+        <span class="quick-chip active" onclick="pickDirectNiche(0, 0)">🔨 Plumbers</span>
+        <span class="quick-chip" onclick="pickDirectNiche(1, 0)">🏠 Roofing</span>
+        <span class="quick-chip" onclick="pickDirectNiche(2, 1)">☀️ Solar</span>
+        <span class="quick-chip" onclick="pickDirectNiche(28, 1)">🛋️ Fitted Wardrobes</span>
+        <span class="quick-chip" onclick="pickDirectNiche(29, 0)">🏊 Pools &amp; Spas</span>
+        <span class="quick-chip" onclick="pickDirectNiche(32, 1)">💎 Watch Repair</span>
+        <span class="quick-chip" onclick="pickDirectNiche(33, 0)">🌿 Heat Pumps</span>
+        <span class="quick-chip" onclick="pickDirectNiche(35, 0)">✈️ Chauffeurs</span>
+        <span class="quick-chip" onclick="pickDirectNiche(34, 0)">❄️ Cold Rooms</span>
+        <span class="quick-chip" onclick="pickDirectNiche(30, 0)">🛥️ Yacht Services</span>
+        <span class="quick-chip" onclick="pickDirectNiche(9, 0)">🦷 Dentists</span>
+        <span class="quick-chip" onclick="pickDirectNiche(10, 0)">💉 Botox</span>
+        <span class="quick-chip" onclick="pickDirectNiche(13, 0)">🚗 Car Detailing</span>
+        <span class="quick-chip" onclick="pickDirectNiche(14, 0)">🏎️ Mechanics</span>
+        <span class="quick-chip" onclick="pickDirectNiche(15, 1)">💦 Pressure Wash</span>
+        <span class="quick-chip" onclick="pickDirectNiche(17, 0)">🐕 Dog Grooming</span>
+        <span class="quick-chip" onclick="pickDirectNiche(5, 0)">🍳 Kitchens</span>
+        <span class="quick-chip" onclick="pickDirectNiche(3, 0)">🌳 Tree Surgeons</span>
+        <span class="quick-chip" onclick="pickDirectNiche(7, 0)">🔑 Locksmiths</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Group 3: Lead Targeting Strategy & Action -->
+  <div class="goldmine-toggle-card">
+    <div class="toggle-details">
+      <label class="custom-switch">
+        <input type="checkbox" id="focusNoWebsite" checked>
+        <span class="slider"></span>
+      </label>
+      <div class="toggle-details-text">
+        <b>⚡ Target Businesses WITHOUT a Website (Freelancer Goldmine)</b>
+        <p>These businesses lose high-ticket Google Maps customers daily and convert 4x faster!</p>
+      </div>
+    </div>
+    <div class="badge badge-no-web" style="padding:5px 12px">
+      ★ Top Conversion Mode
+    </div>
+  </div>
+
+  <!-- Hidden Scraper Inputs -->
+  <input type="hidden" id="business">
+  <input type="hidden" id="location">
+  <input type="hidden" id="cc" value="44">
+
+  <!-- Search Trigger Controls -->
+  <div class="step-continue-bar">
+    <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+      <div style="display:flex;align-items:center;gap:8px">
+        <label style="font-size:12px;margin:0;font-weight:700">Scan Depth:</label>
+        <select id="depth" style="padding:7px 12px;width:auto">
+          <option value="1">~20 leads (Fastest)</option>
+          <option value="2" selected>~40 leads (Recommended)</option>
+          <option value="3">~60 leads</option>
+          <option value="5">~100 leads (Deep scan)</option>
+        </select>
+      </div>
+      <label style="cursor:pointer;font-size:12.5px;display:flex;align-items:center;gap:7px;font-weight:600">
+        <input type="checkbox" id="deep" style="accent-color:#10b981;width:15px;height:15px"> Also extract website emails
+      </label>
+    </div>
+
+    <button id="search" class="primary" style="padding:11px 28px;font-size:14px">
+      🔍 Search Leads Now
+    </button>
+  </div>
+
+  <div id="slog" class="terminal-box" hidden></div>
+</section>
+
+<!-- STEP 2: Prospects Management & Data Table -->
+<section class="app-section" id="sectionStep2" style="display:none">
+  <div class="section-header">
+    <div class="section-title-wrap">
+      <div class="section-icon-badge">📋</div>
+      <div>
+        <h2 class="section-title">Prospects &amp; Leads Studio</h2>
+        <p class="section-desc">Review extracted businesses, filter by website status, verify active WhatsApp numbers, and export.</p>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;align-items:center">
+      <button class="ghost" id="checkWa" style="font-size:12px;padding:7px 14px">
+        ✓ Verify WhatsApp Numbers
+      </button>
+      <a id="exportCsv" href="/api/export.csv" style="text-decoration:none">
+        <button class="ghost" style="font-size:12px;padding:7px 14px">📥 Export CSV</button>
+      </a>
+    </div>
+  </div>
+
+  <!-- KPI Cards -->
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-label">Total Extracted</div>
+      <div class="kpi-value" id="countAll">0</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">⚡ No Website</div>
+      <div class="kpi-value" id="countNoWeb" style="color:var(--accent-gold)">0</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">✓ On WhatsApp</div>
+      <div class="kpi-value" id="countOnWa" style="color:#10b981">0</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Selected</div>
+      <div class="kpi-value" id="countSelected" style="color:var(--accent-purple)">0</div>
+    </div>
+  </div>
+
+  <!-- Table Toolbar -->
+  <div class="table-toolbar">
+    <div class="filter-tabs-group">
+      <button class="filter-pill gold-active" id="tabNoWeb" onclick="setFilter('no-website')">
+        ⚡ No Website (<span id="pillCountNoWeb">0</span>)
+      </button>
+      <button class="filter-pill" id="tabOnWa" onclick="setFilter('on-wa')">
+        📱 WhatsApp Verified (<span id="pillCountOnWa">0</span>)
+      </button>
+      <button class="filter-pill" id="tabHasWeb" onclick="setFilter('has-website')">
+        🌐 Has Website
+      </button>
+      <button class="filter-pill" id="tabAll" onclick="setFilter('all')">
+        All Leads (<span id="pillCountAll">0</span>)
+      </button>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+      <input type="text" id="tableQuickSearch" placeholder="Filter by name, phone..." style="width:200px;padding:7px 12px;font-size:12.5px">
+      <button class="ghost" id="all" style="font-size:11.5px;padding:6px 11px">Select All</button>
+      <button class="ghost" id="none" style="font-size:11.5px;padding:6px 11px">Clear</button>
+    </div>
+  </div>
+
+  <select id="filterWebsite" style="display:none">
+    <option value="no-website">no-website</option>
+    <option value="all">all</option>
+    <option value="has-website">has-website</option>
+    <option value="on-wa">on-wa</option>
+    <option value="no-web-on-wa">no-web-on-wa</option>
+    <option value="not-on-wa">not-on-wa</option>
+  </select>
+
+  <!-- Leads Table -->
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:38px;text-align:center"><input type="checkbox" id="masterSelectCb" style="accent-color:#10b981"></th>
+          <th>Business Name</th>
+          <th>Phone (Direct)</th>
+          <th>Google Rating</th>
+          <th>Category</th>
+          <th>Website / Digital Presence</th>
+        </tr>
+      </thead>
+      <tbody id="tbody">
+        <tr>
+          <td colspan="6" style="text-align:center;padding:42px;color:var(--text-muted)">
+            No leads scraped yet. Use <b>Step 1: Discovery</b> to extract businesses!
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="step-continue-bar">
+    <span id="count" style="font-size:12.5px;color:var(--text-muted);font-weight:700">0 shown · 0 selected</span>
+    <button class="primary" onclick="switchStep(3)">Continue to AI Message Pitch →</button>
   </div>
 </section>
 
-<section id="s2">
-  <h2><span class="n">2</span> Write your message</h2>
-  <div class="row">
-    <div><label>Your name / business</label><input id="sender" placeholder="Kamal, freelance web developer"></div>
-    <div style="flex:2 1 260px"><label>What are you offering?</label><input id="offer" placeholder="build a simple website that brings you customers from Google"></div>
-    <div class="s"><label>Language</label><input id="lang" value="English"></div>
-    <div class="s"><label>Local AI model</label><select id="model"></select></div>
-    <div class="s"><button id="draft">Draft with AI</button></div>
+<!-- STEP 3: Message Pitch Studio & Smartphone Mockup -->
+<section class="app-section" id="sectionStep3" style="display:none">
+  <div class="section-header">
+    <div class="section-title-wrap">
+      <div class="section-icon-badge">✍️</div>
+      <div>
+        <h2 class="section-title">AI WhatsApp Pitch Studio</h2>
+        <p class="section-desc">Craft tailored outreach pitches with dynamic tags and authentic WhatsApp smartphone preview.</p>
+      </div>
+    </div>
+    <div class="badge badge-has-web" id="tonePill" style="font-size:12px;padding:5px 12px">
+      🇬🇧 UK British Etiquette
+    </div>
   </div>
-  <label style="margin-top:12px">Message template — edit freely. <code>{name}</code> becomes each business name; <code>{category}</code>, <code>{location}</code> also work.</label>
-  <textarea id="template" placeholder="Hi {name}, …"></textarea>
-  <div id="dnote" class="hint"></div>
-  <div class="hint">Preview for the first selected business:</div><div class="preview" id="preview">—</div>
-  <div class="row" style="margin-top:14px;align-items:center">
-    <div style="flex:0"><button id="personalise">Personalise each message with AI</button></div>
-    <div class="hint" id="pnote">Writes a unique message per selected business using its name, category, rating, website and area (about 5–20 s each on a laptop). Edit any of them below. Businesses without a custom message get the template.</div>
+
+  <div class="composer-layout">
+    <div>
+      <label style="margin-bottom:8px">Select Pitch Angle:</label>
+      <div class="preset-grid">
+        <div class="preset-card active" onclick="pickPreset('no-website')">
+          <div class="preset-card-title">⚡ "No Website"</div>
+          <div class="preset-card-desc">Missed Google leads</div>
+        </div>
+        <div class="preset-card" onclick="pickPreset('redesign')">
+          <div class="preset-card-title">🚀 Mobile Speed</div>
+          <div class="preset-card-desc">Redesign &amp; speed</div>
+        </div>
+        <div class="preset-card" onclick="pickPreset('reviews')">
+          <div class="preset-card-title">⭐ 5-Star Reviews</div>
+          <div class="preset-card-desc">Reputation boost</div>
+        </div>
+        <div class="preset-card" onclick="pickPreset('lead-bot')">
+          <div class="preset-card-title">🤖 WhatsApp Bot</div>
+          <div class="preset-card-desc">Instant replies</div>
+        </div>
+      </div>
+      <input type="hidden" id="msgPreset" value="no-website">
+
+      <div class="grid-2" style="margin-bottom:12px">
+        <div class="field-wrap">
+          <label>Your Name / Agency</label>
+          <input id="sender" placeholder="e.g. Kamal, Web Specialist">
+        </div>
+        <div class="field-wrap">
+          <label>Language</label>
+          <input id="lang" value="English">
+        </div>
+      </div>
+
+      <div class="field-wrap" style="margin-bottom:12px">
+        <label>Your Core Pitch Offer</label>
+        <input id="offer" value="build a clean, mobile-friendly website that brings you customers from Google" placeholder="build a clean website">
+      </div>
+
+      <div class="field-wrap" style="margin-bottom:12px">
+        <label>Local AI Model (Ollama)</label>
+        <div style="display:flex;gap:8px">
+          <select id="model" style="flex:1"></select>
+          <button id="draft" class="ghost" style="flex:0 0 auto">🤖 Draft with AI</button>
+        </div>
+        <div id="dnote" class="field-hint" style="margin-top:4px"></div>
+      </div>
+
+      <div class="field-wrap">
+        <label>
+          <span>WhatsApp Message Template</span>
+          <span class="field-hint">Click tags to insert</span>
+        </label>
+        <div class="tag-pills-bar">
+          <span class="tag-pill" onclick="insertTag('{name}')">{name}</span>
+          <span class="tag-pill" onclick="insertTag('{category}')">{category}</span>
+          <span class="tag-pill" onclick="insertTag('{location}')">{location}</span>
+          <span class="tag-pill" onclick="insertTag('{currency}')">{currency}</span>
+          <span class="tag-pill" onclick="insertTag('{business}')">{business}</span>
+        </div>
+        <textarea id="template" style="min-height:120px"></textarea>
+      </div>
+
+      <div style="margin-top:14px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+        <button id="personalise" class="ghost">✨ Personalise Each Lead with AI</button>
+        <span class="field-hint" id="pnote">Writes bespoke messages for each business.</span>
+      </div>
+
+      <div id="custom" style="margin-top:12px"></div>
+    </div>
+
+    <!-- Authentic Light/Dark WhatsApp Smartphone Mockup -->
+    <div class="phone-mockup-wrapper">
+      <div class="phone-frame">
+        <div class="phone-top-notch">
+          <span>9:41</span>
+          <div class="phone-notch-island"></div>
+          <span>100% 🔋</span>
+        </div>
+
+        <div class="wa-chat-header">
+          <div class="wa-avatar" id="mockAvatar">🏢</div>
+          <div class="wa-chat-info">
+            <div class="wa-chat-name" id="mockLeadName">Premier Local Business</div>
+            <div class="wa-chat-status">online</div>
+          </div>
+          <div style="display:flex;gap:10px;color:#ffffff;font-size:14px">
+            <span>📹</span>
+            <span>📞</span>
+          </div>
+        </div>
+
+        <div class="wa-chat-body">
+          <div class="wa-bubble-sent">
+            <div id="preview">—</div>
+            <div class="wa-bubble-meta">
+              <span>9:42 AM</span>
+              <span class="wa-ticks">✓✓</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="wa-chat-footer">
+          <span>😊</span>
+          <div class="wa-input-fake">Message</div>
+          <span>📎</span>
+        </div>
+      </div>
+      <div style="margin-top:10px;font-size:11.5px;color:var(--text-muted);text-align:center;font-weight:600">
+        📱 Live WhatsApp Preview for selected business
+      </div>
+    </div>
   </div>
-  <div id="custom"></div>
+
+  <div class="step-continue-bar">
+    <button class="ghost" onclick="switchStep(2)">← Back to Prospects</button>
+    <button class="primary" onclick="switchStep(4)">Continue to WhatsApp &amp; Send →</button>
+  </div>
 </section>
 
-<section id="s3">
-  <h2><span class="n">3</span> Connect WhatsApp <span id="wapill" class="pill">not connected</span></h2>
-  <p class="mute" style="margin:4px 0 10px">Messages go from <b>your own number</b>. Open WhatsApp on your phone → <b>Linked devices</b> → <b>Link a device</b> → scan.</p>
-  <button id="connect">Connect / show QR</button> <button class="ghost" id="logout">Log out</button>
-  <div id="qr"></div><div id="wanote" class="hint"></div>
+<!-- STEP 4: WhatsApp Connection & Safe Outreach -->
+<section class="app-section" id="sectionStep4" style="display:none">
+  <div class="section-header">
+    <div class="section-title-wrap">
+      <div class="section-icon-badge">🚀</div>
+      <div>
+        <h2 class="section-title">WhatsApp Account &amp; Outreach Campaign</h2>
+        <p class="section-desc">Connect WhatsApp via official QR code and launch human-like, ban-protected outreach campaigns.</p>
+      </div>
+    </div>
+    <div id="wapill" class="badge badge-wa-no" style="font-size:11.5px;padding:5px 12px">
+      Disconnected
+    </div>
+  </div>
+
+  <!-- WhatsApp Session Card -->
+  <div class="wa-connection-card">
+    <div class="wa-conn-left">
+      <div class="wa-conn-logo">📱</div>
+      <div>
+        <h3 style="font-size:15px;color:var(--text-primary);font-weight:800" id="waStatusTitle">Connect WhatsApp Web</h3>
+        <p style="font-size:12.5px;color:var(--text-muted);margin-top:3px" id="waStatusDesc">
+          Outreach is sent directly from <b>your own WhatsApp number</b>. No external cloud credentials required.
+        </p>
+        <div id="wanote" style="font-size:11.5px;color:var(--brand-primary);margin-top:4px;font-weight:600"></div>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:10px;align-items:center">
+      <button id="connect" class="action-green">📲 Connect / Show QR Code</button>
+      <button class="ghost" id="logout">Log Out</button>
+    </div>
+  </div>
+
+  <div id="qrWrap" style="display:flex;justify-content:center">
+    <div id="qr"></div>
+  </div>
+
+  <!-- Dispatcher Controls -->
+  <div class="sending-dashboard">
+    <h3 style="font-size:14.5px;font-weight:800;color:var(--text-primary);margin-bottom:12px">
+      🛡️ Anti-Ban Smart Throttling Controls
+    </h3>
+
+    <div class="grid-3" style="align-items:end">
+      <div class="field-wrap">
+        <label>Session Limit <span class="field-hint">Max messages</span></label>
+        <input id="limit" type="number" value="15" min="1">
+      </div>
+      <div class="field-wrap">
+        <label>Min Delay (Seconds) <span class="field-hint">Human jitter</span></label>
+        <input id="gmin" type="number" value="45" min="10">
+      </div>
+      <div class="field-wrap">
+        <label>Max Delay (Seconds) <span class="field-hint">Ban protection</span></label>
+        <input id="gmax" type="number" value="120" min="10">
+      </div>
+    </div>
+
+    <div style="display:flex;gap:12px;margin-top:18px;align-items:center;flex-wrap:wrap">
+      <button class="primary" id="send" style="padding:11px 28px;font-size:14px">
+        🚀 Launch Outreach Campaign
+      </button>
+      <button class="danger" id="stop" disabled>Stop Campaign</button>
+      <span id="sendingQuickCount" style="font-size:12.5px;color:var(--text-muted);font-weight:700"></span>
+    </div>
+
+    <div class="progress-wrap">
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="fill"></div>
+      </div>
+      <div class="progress-status-text">
+        <span id="sstat">Idle · Ready to dispatch</span>
+        <span id="progressPercent">0%</span>
+      </div>
+    </div>
+
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:16px">
+      <label style="font-size:12px;margin:0;font-weight:700">Real-Time Dispatch Console:</label>
+      <span class="custom-link" id="toggleTerminalBtn" style="margin:0">Hide Logs</span>
+    </div>
+    <div id="log" class="terminal-box">Waiting for campaign start…</div>
+  </div>
+
+  <div class="step-continue-bar">
+    <button class="ghost" onclick="switchStep(3)">← Back to Pitch Studio</button>
+    <button class="ghost" onclick="switchStep(1)">Back to Step 1: Discovery</button>
+  </div>
 </section>
 
-<section id="s4">
-  <h2><span class="n">4</span> Send</h2>
-  <div class="row">
-    <div class="s"><label>Max messages this run</label><input id="limit" type="number" value="15" min="1"></div>
-    <div class="s"><label>Gap min (s)</label><input id="gmin" type="number" value="45" min="10"></div>
-    <div class="s"><label>Gap max (s)</label><input id="gmax" type="number" value="120" min="10"></div>
-    <div class="s"><button class="go" id="send">Send to selected</button></div>
-    <div class="s"><button class="stop" id="stop" disabled>Stop</button></div>
-  </div>
-  <p class="warn hint">⚠ WhatsApp bans personal numbers that send many cold messages fast. Keep it to <b>15–20 new contacts per day</b>, keep the gaps, and always leave the opt-out line in. Already-messaged numbers are skipped automatically.</p>
-  <div class="bar"><i id="fill"></i></div>
-  <div id="sstat" class="mute"></div>
-  <div id="log" class="log"></div>
-</section>
 </main>
 
+<div class="toast-container" id="toastContainer"></div>
+
 <script>
+
 const $ = id => document.getElementById(id);
 const api = (p, b) => fetch(p, b ? { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(b) } : { method: p.startsWith('/api/wa') || p.startsWith('/api/send') ? 'POST' : 'GET' }).then(r => r.json());
-let leads = [], selected = new Set(), custom = {}; // custom[phone] = per-business AI message
-const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const render = (t, l) => t.replace(/\{(name|category|address|location|business)\}/g, (_, k) => l[k] ?? '');
-const logTo = (el, line) => { el.hidden = false; el.textContent += line + '\n'; el.scrollTop = el.scrollHeight; };
 
-// ── health / models
-api('/api/health').then(h => {
-  $('model').innerHTML = h.ollama.length ? h.ollama.map(m => `<option>${esc(m)}</option>`).join('') : '<option value="">(Ollama not running)</option>';
-  const pick = h.ollama.find(m => /llama3|qwen|gemma|mistral|phi/i.test(m)); if (pick) $('model').value = pick;
-  $('health').textContent = h.ollama.length ? `local AI: ${h.ollama.length} model(s) via Ollama` : 'local AI off — install Ollama for AI drafts (a plain template still works)';
-  waStatus(h.wa);
+let leads = [], selected = new Set(), custom = {}, notOnWaSet = new Set(), waCheckedMap = {};
+let currentFilter = 'no-website';
+let currentSearchQuery = '';
+
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const render = (t, l) => t.replace(/\{(name|category|address|location|business|currency)\}/g, (_, k) => l[k] ?? '');
+
+// Theme System
+function initTheme() {
+  let saved = localStorage.getItem('m2w_theme_v3');
+  if (!saved) {
+    saved = 'light';
+    localStorage.setItem('m2w_theme_v3', 'light');
+    localStorage.setItem('m2w_theme', 'light');
+  }
+  document.documentElement.setAttribute('data-theme', saved);
+  updateThemeIcon(saved);
+}
+
+function toggleTheme() {
+  const current = document.documentElement.getAttribute('data-theme') || 'dark';
+  const next = current === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('m2w_theme', next); localStorage.setItem('m2w_theme_v3', next);
+  updateThemeIcon(next);
+  showToast(`Switched to ${next} mode`, 'info');
+}
+
+function updateThemeIcon(theme) {
+  const icon = $('themeIcon');
+  if (icon) { icon.textContent = theme === 'dark' ? '☀️' : '🌙'; $('themeToggleBtn').title = theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'; }
+}
+
+if ($('themeToggleBtn')) $('themeToggleBtn').onclick = toggleTheme;
+
+function showToast(msg, type = 'info') {
+  const container = $('toastContainer');
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  const icon = type === 'success' ? '✅' : type === 'error' ? '❌' : type === 'warning' ? '⚠️' : 'ℹ️';
+  toast.innerHTML = `<span>${icon}</span><span>${esc(msg)}</span>`;
+  container.appendChild(toast);
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateY(12px) scale(0.96)';
+    toast.style.transition = 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)';
+    setTimeout(() => toast.remove(), 250);
+  }, 3500);
+}
+
+const logTo = (el, line) => {
+  el.hidden = false;
+  const time = new Date().toLocaleTimeString();
+  let lineClass = 'terminal-line-info';
+  if (line.startsWith('✓') || line.includes('sent')) lineClass = 'terminal-line-success';
+  else if (line.startsWith('✗') || line.includes('failed') || line.includes('error')) lineClass = 'terminal-line-error';
+  else if (line.includes('Waiting') || line.includes('s before')) lineClass = 'terminal-line-warn';
+
+  const entry = document.createElement('div');
+  entry.className = lineClass;
+  entry.textContent = `[${time}] ${line}`;
+  el.appendChild(entry);
+  el.scrollTop = el.scrollHeight;
+};
+
+// Toggle terminal
+$('toggleTerminalBtn').onclick = () => {
+  const t = $('log');
+  const hidden = t.style.display === 'none';
+  t.style.display = hidden ? 'block' : 'none';
+  $('toggleTerminalBtn').textContent = hidden ? 'Hide Logs' : 'Show Logs';
+};
+
+function switchStep(stepNum) {
+  for (let i = 1; i <= 4; i++) {
+    const sec = $(`sectionStep${i}`);
+    const tab = $(`tabStep${i}`);
+    if (sec) sec.style.display = i === stepNum ? 'block' : 'none';
+    if (tab) tab.classList.toggle('active', i === stepNum);
+  }
+}
+
+// Keyboard shortcuts (1-4 for workflow steps)
+window.addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
+  if (['1', '2', '3', '4'].includes(e.key)) {
+    switchStep(+e.key);
+  }
 });
 
-// ── step 1
-$('search').onclick = async () => {
-  $('search').disabled = true; $('slog').textContent = ''; $('results').hidden = true;
-  const r = await api('/api/scrape', { business: $('business').value.trim(), location: $('location').value.trim(), cc: $('cc').value.trim(), depth: +$('depth').value, deep: $('deep').checked }).catch(e => ({ error: e.message }));
-  $('search').disabled = false;
-  if (r.error) return logTo($('slog'), '✗ ' + r.error);
-  leads = r.leads; selected = new Set(leads.filter(l => l.phone).map(l => l.phone)); custom = {}; $('custom').innerHTML = '';
-  drawTable(); $('results').hidden = false; preview();
-};
-function drawTable() {
-  $('tbody').innerHTML = leads.map(l => `<tr>
-    <td>${l.phone ? `<input type="checkbox" data-p="${l.phone}" ${selected.has(l.phone) ? 'checked' : ''}>` : '<span class="mute" title="no phone">–</span>'}</td>
-    <td><b>${esc(l.name)}</b></td><td>${l.phone ? '+' + l.phone : '<span class="mute">no phone</span>'}</td>
-    <td>${l.review_rating ? l.review_rating + (+l.review_count ? ` <span class="mute">(${l.review_count})</span>` : '') : ''}</td><td>${esc(l.category)}</td>
-    <td class="mute">${esc(l.emails || l.website)}</td></tr>`).join('');
-  $('count').textContent = `${leads.length} found · ${leads.filter(l => l.phone).length} with phone · ${selected.size} selected`;
-  $('tbody').querySelectorAll('input').forEach(cb => cb.onchange = () => { cb.checked ? selected.add(cb.dataset.p) : selected.delete(cb.dataset.p); drawTable(); preview(); });
-}
-$('all').onclick = () => { selected = new Set(leads.filter(l => l.phone).map(l => l.phone)); drawTable(); preview(); };
-$('none').onclick = () => { selected.clear(); drawTable(); preview(); };
+// ════════════════════════════════════════════════════════════════════════════
+// 15 HIGH-VALUE COUNTRIES & WEALTHY REGIONS (PRESERVED)
+// ════════════════════════════════════════════════════════════════════════════
+const CASCADING_COUNTRIES = [
+  {
+    code: 'UK',
+    name: 'United Kingdom',
+    flag: '🇬🇧',
+    cc: '44',
+    curr: 'GBP',
+    sym: '£',
+    sampleDeal: 250,
+    toneDesc: '🇬🇧 UK British Etiquette: Polite, understated, British English (colour, customise)',
+    regions: [
+      { name: 'Surrey (Wealthiest UK County)', cities: ['Guildford, Surrey, UK', 'Woking, Surrey, UK', 'Epsom, Surrey, UK', 'Farnham, Surrey, UK', 'Camberley, Surrey, UK', 'Leatherhead, Surrey, UK', 'Weybridge, Surrey, UK', 'Esher, Surrey, UK'] },
+      { name: 'Berkshire & Thames Valley', cities: ['Windsor, Berkshire, UK', 'Maidenhead, Berkshire, UK', 'Ascot, Berkshire, UK', 'Newbury, Berkshire, UK', 'Bracknell, Berkshire, UK', 'Reading, Berkshire, UK'] },
+      { name: 'Cheshire & Golden Triangle', cities: ['Wilmslow, Cheshire, UK', 'Alderley Edge, Cheshire, UK', 'Knutsford, Cheshire, UK', 'Altrincham, Cheshire, UK', 'Hale, Cheshire, UK', 'Prestbury, Cheshire, UK'] },
+      { name: 'Greater London (Affluent Outer Suburbs)', cities: ['Richmond upon Thames, London, UK', 'Wimbledon, London, UK', 'Kensington, London, UK', 'Bromley, London, UK', 'Kingston upon Thames, London, UK', 'Harrow, London, UK'] },
+      { name: 'Hertfordshire & Buckinghamshire', cities: ['St Albans, Hertfordshire, UK', 'Harpenden, Hertfordshire, UK', 'Beaconsfield, Buckinghamshire, UK', 'Marlow, Buckinghamshire, UK', 'Gerrards Cross, Buckinghamshire, UK'] },
+      { name: 'West Midlands Suburbs', cities: ['Solihull, West Midlands, UK', 'Sutton Coldfield, West Midlands, UK', 'Dorridge, West Midlands, UK', 'Knowle, West Midlands, UK', 'Coventry, West Midlands, UK'] },
+      { name: 'Yorkshire (Historic Rich Towns)', cities: ['Harrogate, North Yorkshire, UK', 'Ripon, North Yorkshire, UK', 'Ilkley, West Yorkshire, UK', 'Wetherby, West Yorkshire, UK', 'York, North Yorkshire, UK'] },
+      { name: 'Scotland High-Income Areas', cities: ['Morningside, Edinburgh, UK', 'Stockbridge, Edinburgh, UK', 'Aberdeen, Scotland, UK', 'St Andrews, Scotland, UK', 'Glasgow West End, UK'] }
+    ]
+  },
+  {
+    code: 'US',
+    name: 'United States',
+    flag: '🇺🇸',
+    cc: '1',
+    curr: 'USD',
+    sym: '$',
+    sampleDeal: 350,
+    toneDesc: '🇺🇸 US Direct Etiquette: Value/ROI-focused, concise, American English',
+    regions: [
+      { name: 'California - Orange County (High Wealth)', cities: ['Newport Beach, CA, USA', 'Laguna Beach, CA, USA', 'Irvine, CA, USA', 'San Clemente, CA, USA', 'Dana Point, CA, USA', 'Costa Mesa, CA, USA'] },
+      { name: 'California - Silicon Valley & Bay Area', cities: ['Los Gatos, CA, USA', 'Palo Alto, CA, USA', 'Saratoga, CA, USA', 'Menlo Park, CA, USA', 'Walnut Creek, CA, USA', 'San Jose, CA, USA'] },
+      { name: 'Texas - Dallas / Collin County', cities: ['Frisco, TX, USA', 'Plano, TX, USA', 'Southlake, TX, USA', 'McKinney, TX, USA', 'Prosper, TX, USA', 'Allen, TX, USA'] },
+      { name: 'Texas - Greater Houston Suburbs', cities: ['The Woodlands, TX, USA', 'Katy, TX, USA', 'Sugar Land, TX, USA', 'Spring, TX, USA', 'Conroe, TX, USA'] },
+      { name: 'Florida - South Florida & Gulf Coast', cities: ['Naples, FL, USA', 'Boca Raton, FL, USA', 'Sarasota, FL, USA', 'Palm Beach Gardens, FL, USA', 'Delray Beach, FL, USA', 'Fort Lauderdale, FL, USA'] },
+      { name: 'New York - Long Island & Westchester', cities: ['Garden City, NY, USA', 'Scarsdale, NY, USA', 'Rye, NY, USA', 'Oyster Bay, NY, USA', 'Huntington, NY, USA'] },
+      { name: 'North Carolina - Research Triangle', cities: ['Cary, NC, USA', 'Chapel Hill, NC, USA', 'Apex, NC, USA', 'Raleigh, NC, USA', 'Wake Forest, NC, USA'] },
+      { name: 'Arizona - Phoenix Metro & Scottsdale', cities: ['Scottsdale, AZ, USA', 'Paradise Valley, AZ, USA', 'Gilbert, AZ, USA', 'Chandler, AZ, USA'] }
+    ]
+  },
+  {
+    code: 'UAE',
+    name: 'United Arab Emirates',
+    flag: '🇦🇪',
+    cc: '971',
+    curr: 'AED',
+    sym: 'AED',
+    sampleDeal: 1200,
+    toneDesc: '🇦🇪 UAE Professional: Courteous, respectful, business-focused',
+    regions: [
+      { name: 'Dubai - Prime Commercial & Tech', cities: ['Business Bay, Dubai, UAE', 'Downtown Dubai, UAE', 'Dubai Marina, UAE', 'Jumeirah Lakes Towers, Dubai, UAE', 'Dubai Silicon Oasis, UAE'] },
+      { name: 'Dubai - Services & Affluent Residential', cities: ['Al Barsha, Dubai, UAE', 'Jumeirah, Dubai, UAE', 'Umm Suqeim, Dubai, UAE', 'Dubai Hills, Dubai, UAE', 'Al Quoz, Dubai, UAE'] },
+      { name: 'Abu Dhabi - Premium Districts', cities: ['Al Reem Island, Abu Dhabi, UAE', 'Yas Island, Abu Dhabi, UAE', 'Khalifa City, Abu Dhabi, UAE', 'Al Maryah Island, Abu Dhabi, UAE', 'Mussafah, Abu Dhabi, UAE'] },
+      { name: 'Northern Emirates', cities: ['Al Majaz, Sharjah, UAE', 'Muwaileh, Sharjah, UAE', 'Ajman, UAE', 'Ras Al Khaimah, UAE'] }
+    ]
+  },
+  {
+    code: 'AU',
+    name: 'Australia',
+    flag: '🇦🇺',
+    cc: '61',
+    curr: 'AUD',
+    sym: 'A$',
+    sampleDeal: 450,
+    toneDesc: '🇦🇺 Australia Tradie & Business: Friendly, straightforward, no high pressure',
+    regions: [
+      { name: 'New South Wales - Sydney Coastal & Suburbs', cities: ['Manly, NSW, Australia', 'Cronulla, NSW, Australia', 'Chatswood, NSW, Australia', 'Parramatta, NSW, Australia', 'Byron Bay, NSW, Australia', 'Newcastle, NSW, Australia'] },
+      { name: 'Victoria - Melbourne Bayside & Regional', cities: ['Brighton, VIC, Australia', 'Toorak, VIC, Australia', 'Mornington, VIC, Australia', 'Camberwell, VIC, Australia', 'Geelong, VIC, Australia'] },
+      { name: 'Queensland - Gold Coast & Sunshine Coast', cities: ['Noosa, QLD, Australia', 'Surfers Paradise, QLD, Australia', 'Maroochydore, QLD, Australia', 'Southport, QLD, Australia', 'Brisbane, QLD, Australia'] },
+      { name: 'Western Australia - Perth Metro', cities: ['Cottesloe, WA, Australia', 'Fremantle, WA, Australia', 'Subiaco, WA, Australia', 'Joondalup, WA, Australia'] }
+    ]
+  },
+  {
+    code: 'CA',
+    name: 'Canada',
+    flag: '🇨🇦',
+    cc: '1',
+    curr: 'CAD',
+    sym: 'C$',
+    sampleDeal: 400,
+    toneDesc: '🇨🇦 Canada: Friendly, clear, polite and transparent',
+    regions: [
+      { name: 'Ontario - Halton & Peel (Wealthy GTA West)', cities: ['Oakville, ON, Canada', 'Burlington, ON, Canada', 'Milton, ON, Canada', 'Mississauga, ON, Canada'] },
+      { name: 'Ontario - York Region & Tech Hubs', cities: ['Markham, ON, Canada', 'Richmond Hill, ON, Canada', 'Vaughan, ON, Canada', 'Aurora, ON, Canada', 'Waterloo, ON, Canada'] },
+      { name: 'British Columbia - Metro Vancouver & Island', cities: ['West Vancouver, BC, Canada', 'North Vancouver, BC, Canada', 'Kelowna, BC, Canada', 'Victoria, BC, Canada', 'Coquitlam, BC, Canada'] },
+      { name: 'Alberta - Major Hubs', cities: ['Canmore, AB, Canada', 'Calgary, AB, Canada', 'Airdrie, AB, Canada', 'St. Albert, AB, Canada'] }
+    ]
+  },
+  {
+    code: 'SA',
+    name: 'Saudi Arabia',
+    flag: '🇸🇦',
+    cc: '966',
+    curr: 'SAR',
+    sym: 'SAR',
+    sampleDeal: 1200,
+    toneDesc: '🇸🇦 KSA Respectful: Courteous, formal, Arabic/English professional',
+    regions: [
+      { name: 'Riyadh Prime Districts', cities: ['Al Malqa, Riyadh, Saudi Arabia', 'Al Nakheel, Riyadh, Saudi Arabia', 'Al Olaya, Riyadh, Saudi Arabia', 'Hittin, Riyadh, Saudi Arabia', 'Al Yasmin, Riyadh, Saudi Arabia'] },
+      { name: 'Jeddah Prime Districts', cities: ['Al Rawdah, Jeddah, Saudi Arabia', 'Al Zahra, Jeddah, Saudi Arabia', 'Al Andalus, Jeddah, Saudi Arabia', 'Al Shati, Jeddah, Saudi Arabia'] },
+      { name: 'Eastern Province', cities: ['Khobar, Saudi Arabia', 'Dhahran, Saudi Arabia', 'Dammam, Saudi Arabia'] }
+    ]
+  },
+  {
+    code: 'CH',
+    name: 'Switzerland',
+    flag: '🇨🇭',
+    cc: '41',
+    curr: 'CHF',
+    sym: 'CHF',
+    sampleDeal: 450,
+    toneDesc: '🇨🇭 Switzerland: Precise, high standard, polite English/German',
+    regions: [
+      { name: 'Zurich Canton & Gold Coast', cities: ['Kusnacht, Switzerland', 'Meilen, Switzerland', 'Winterthur, Switzerland', 'Uster, Switzerland', 'Zurich, Switzerland'] },
+      { name: 'Lake Geneva & Vaud', cities: ['Lausanne, Switzerland', 'Montreux, Switzerland', 'Nyon, Switzerland', 'Vevey, Switzerland', 'Geneva, Switzerland'] },
+      { name: 'Central Switzerland (Zug Valley)', cities: ['Zug, Switzerland', 'Baar, Switzerland', 'Lucerne, Switzerland'] }
+    ]
+  },
+  {
+    code: 'IE',
+    name: 'Ireland',
+    flag: '🇮🇪',
+    cc: '353',
+    curr: 'EUR',
+    sym: '€',
+    sampleDeal: 350,
+    toneDesc: '🇮🇪 Ireland: Warm, friendly, direct, English speaking EU market',
+    regions: [
+      { name: 'South Dublin Affluent Suburbs', cities: ['Blackrock, Dublin, Ireland', 'Dalkey, Dublin, Ireland', 'Foxrock, Dublin, Ireland', 'Sandyford, Dublin, Ireland', 'Dun Laoghaire, Dublin, Ireland'] },
+      { name: 'North Dublin & Coastal Towns', cities: ['Malahide, Dublin, Ireland', 'Howth, Dublin, Ireland', 'Swords, Dublin, Ireland'] },
+      { name: 'Regional Growth Hubs', cities: ['Cork, Ireland', 'Galway, Ireland', 'Limerick, Ireland', 'Kilkenny, Ireland'] }
+    ]
+  },
+  {
+    code: 'NZ',
+    name: 'New Zealand',
+    flag: '🇳🇿',
+    cc: '64',
+    curr: 'NZD',
+    sym: 'NZ$',
+    sampleDeal: 400,
+    toneDesc: '🇳🇿 New Zealand: Friendly, genuine, collaborative Kiwi tone',
+    regions: [
+      { name: 'Auckland Affluent Suburbs', cities: ['Takapuna, Auckland, New Zealand', 'Ponsonby, Auckland, New Zealand', 'Devonport, Auckland, New Zealand', 'Albany, Auckland, New Zealand'] },
+      { name: 'Bay of Plenty & Coastal', cities: ['Mount Maunganui, New Zealand', 'Tauranga, New Zealand', 'Whangarei, New Zealand'] },
+      { name: 'South Island Tourism & Wealth', cities: ['Queenstown, New Zealand', 'Wanaka, New Zealand', 'Christchurch, New Zealand'] }
+    ]
+  },
+  {
+    code: 'DE',
+    name: 'Germany',
+    flag: '🇩🇪',
+    cc: '49',
+    curr: 'EUR',
+    sym: '€',
+    sampleDeal: 350,
+    toneDesc: '🇩🇪 Germany: Professional, structured, precise specification',
+    regions: [
+      { name: 'Bavaria & South (Mittelstand Wealth)', cities: ['Starnberg, Germany', 'Rosenheim, Germany', 'Augsburg, Germany', 'Regensburg, Germany', 'Ingolstadt, Germany'] },
+      { name: 'Baden-Württemberg Hubs', cities: ['Heidelberg, Germany', 'Baden-Baden, Germany', 'Tübingen, Germany', 'Freiburg, Germany'] },
+      { name: 'Hesse & Rhine-Main', cities: ['Bad Homburg, Germany', 'Wiesbaden, Germany', 'Darmstadt, Germany', 'Frankfurt, Germany'] }
+    ]
+  },
+  {
+    code: 'NL',
+    name: 'Netherlands',
+    flag: '🇳🇱',
+    cc: '31',
+    curr: 'EUR',
+    sym: '€',
+    sampleDeal: 350,
+    toneDesc: '🇳🇱 Netherlands: 95%+ English fluent, pragmatic, direct',
+    regions: [
+      { name: 'North Holland & Coastal', cities: ['Haarlem, Netherlands', 'Amstelveen, Netherlands', 'Hilversum, Netherlands', 'Alkmaar, Netherlands'] },
+      { name: 'South Holland & Tech Utrecht', cities: ['Utrecht, Netherlands', 'Leiden, Netherlands', 'Delft, Netherlands', 'Eindhoven, Netherlands'] }
+    ]
+  },
+  {
+    code: 'KW',
+    name: 'Kuwait',
+    flag: '🇰🇼',
+    cc: '965',
+    curr: 'KWD',
+    sym: 'KD',
+    sampleDeal: 100,
+    toneDesc: '🇰🇼 Kuwait: Highest valued currency on Earth (~900 PKR), courteous',
+    regions: [
+      { name: 'Kuwait Major Commercial Areas', cities: ['Kuwait City, Kuwait', 'Salmiya, Kuwait', 'Hawally, Kuwait', 'Shuwaikh, Kuwait', 'Al Ahmadi, Kuwait'] }
+    ]
+  },
+  {
+    code: 'QA',
+    name: 'Qatar',
+    flag: '🇶🇦',
+    cc: '974',
+    curr: 'QAR',
+    sym: 'QAR',
+    sampleDeal: 1200,
+    toneDesc: '🇶🇦 Qatar: High disposable income, polite and professional',
+    regions: [
+      { name: 'Qatar Key Districts', cities: ['Lusail, Qatar', 'The Pearl-Qatar, Doha', 'Doha, Qatar', 'Al Wakrah, Qatar', 'West Bay, Doha, Qatar'] }
+    ]
+  },
+  {
+    code: 'SG',
+    name: 'Singapore',
+    flag: '🇸🇬',
+    cc: '65',
+    curr: 'SGD',
+    sym: 'S$',
+    sampleDeal: 400,
+    toneDesc: '🇸🇬 Singapore: Fast, efficient, English-speaking global commerce',
+    regions: [
+      { name: 'Singapore Prime Districts', cities: ['Orchard, Singapore', 'Bukit Timah, Singapore', 'Novena, Singapore', 'Tampines, Singapore', 'Jurong East, Singapore'] }
+    ]
+  },
+  {
+    code: 'PK',
+    name: 'Pakistan (Local Market)',
+    flag: '🇵🇰',
+    cc: '92',
+    curr: 'PKR',
+    sym: '₨',
+    sampleDeal: 35000,
+    toneDesc: '🇵🇰 Pakistan: Friendly Urdu or English, local SME outreach',
+    regions: [
+      { name: 'Lahore Prime Commercial', cities: ['Gulberg, Lahore, Pakistan', 'DHA, Lahore, Pakistan', 'Johar Town, Lahore, Pakistan', 'Model Town, Lahore, Pakistan', 'Bahria Town, Lahore, Pakistan'] },
+      { name: 'Karachi Prime Commercial', cities: ['DHA, Karachi, Pakistan', 'Clifton, Karachi, Pakistan', 'Gulshan-e-Iqbal, Karachi, Pakistan', 'PECHS, Karachi, Pakistan'] },
+      { name: 'Islamabad & Rawalpindi', cities: ['F-7, Islamabad, Pakistan', 'F-10, Islamabad, Pakistan', 'Blue Area, Islamabad, Pakistan', 'Bahria Town, Rawalpindi, Pakistan'] }
+    ]
+  }
+];
 
-// ── step 2
-$('draft').onclick = async () => {
-  $('draft').disabled = true; $('dnote').textContent = 'Thinking (local model, 5–30 s)…';
-  const r = await api('/api/draft', { business: $('business').value, location: $('location').value, offer: $('offer').value, sender: $('sender').value, model: $('model').value, lang: $('lang').value });
-  $('draft').disabled = false; $('template').value = r.template; preview();
-  $('dnote').textContent = r.fallback ? `Ollama unavailable (${r.error}) — using a plain template. Edit it below.` : 'Drafted by your local AI. Edit anything you like.';
-};
-function preview() { const l = leads.find(x => selected.has(x.phone)) || { name: 'Bright Walls Painters', category: 'Painter', location: $('location').value, business: $('business').value }; $('preview').textContent = custom[l.phone] || ($('template').value ? render($('template').value, l) : '—'); }
-const msgFor = l => custom[l.phone] || render($('template').value, l);
-$('personalise').onclick = async () => {
-  const list = leads.filter(l => selected.has(l.phone));
-  if (!list.length) return alert('Search and select some businesses first.');
-  if (!$('template').value.includes('{name}')) return alert('Write or draft a template with {name} first — it is the base the AI personalises.');
-  $('personalise').disabled = true; $('custom').innerHTML = ''; $('pnote').textContent = `Personalising 0/${list.length}…`;
-  const r = await api('/api/personalise', { leads: list, template: $('template').value, business: $('business').value, location: $('location').value, offer: $('offer').value, sender: $('sender').value, model: $('model').value, lang: $('lang').value });
-  $('personalise').disabled = false; $('pnote').textContent = r.error ? '✗ ' + r.error : `Done — ${list.length} custom messages. Edit any below; they are what gets sent.`;
-};
-function addCustom(d) {
-  custom[d.phone] = d.message;
-  const div = document.createElement('div'); div.style.marginTop = '10px';
-  div.innerHTML = `<label><b>${esc(d.name)}</b> · +${d.phone}${d.error ? ` <span class="bad">(AI failed: ${esc(d.error)} — template used)</span>` : ''}</label><textarea style="min-height:90px"></textarea>`;
-  const ta = div.querySelector('textarea'); ta.value = d.message; ta.oninput = () => { custom[d.phone] = ta.value; preview(); };
-  $('custom').appendChild(div); preview();
+// ════════════════════════════════════════════════════════════════════════════
+// 28 HIGH-TICKET SECTORS & 350+ MICRO-NICHES (PRESERVED)
+// ════════════════════════════════════════════════════════════════════════════
+const CASCADING_SECTORS = [
+  {
+    "name": "🔧 Emergency Trades, Plumbing & HVAC",
+    "niches": [
+      "Emergency Plumbers & Drain Unblocking",
+      "Boiler Installation & Central Heating Repair",
+      "Gas Safe Engineers",
+      "HVAC & Commercial Air Conditioning",
+      "Heat Pump Installation & Servicing",
+      "Underfloor Heating Specialists",
+      "Leak Detection & Pipe Repair",
+      "CCTV Drain Surveys & Relining",
+      "Bathroom Plumbing & Shower Installers",
+      "Water Softener & Filtration Systems",
+      "Commercial Refrigeration Repair",
+      "Saniflo Macerator Repairs",
+      "Radiator Replacement & Power Flushing"
+    ]
+  },
+  {
+    "name": "🏠 Roofing, Gutters & Chimney Specialists",
+    "niches": [
+      "Roof Replacement & Re-Roofing",
+      "Flat Roofing & EPDM Rubber Specialists",
+      "Slate & Tile Roof Repair",
+      "Chimney Stack Repair & Repointing",
+      "Fascias, Soffits & Guttering Installers",
+      "Gutter Cleaning & Vacuum Clearance",
+      "Leadwork & Flashing Specialists",
+      "Roof Moss Removal & Coating",
+      "Emergency Storm Damage Roofers",
+      "Metal Roofing & Cladding",
+      "Skylight & Velux Window Fitters",
+      "Thatched Roof Specialists"
+    ]
+  },
+  {
+    "name": "⚡ Electrical, Solar & EV Charging",
+    "niches": [
+      "Emergency Electricians (24/7)",
+      "Solar Panel Installation & Inverters",
+      "Home EV Charger Installers",
+      "Battery Storage Systems (Tesla Powerwall)",
+      "Smart Home & Home Cinema Automation",
+      "Fuse Box & Consumer Unit Upgrades",
+      "Commercial Electrical Contractors",
+      "EICR Landlord Electrical Safety Certificates",
+      "Rewiring & Fault Finding",
+      "Security & Landscape Lighting"
+    ]
+  },
+  {
+    "name": "🌳 Landscaping, Tree Surgery & Paving",
+    "niches": [
+      "Tree Surgeons & Arborists (Tree Removal)",
+      "Stump Grinding & Tree Pruning",
+      "Block Paving & Resin Bound Driveways",
+      "Artificial Grass & Lawn Turf Installers",
+      "Landscape Garden Design & Build",
+      "Fencing, Gates & Trellis Fitters",
+      "Composite & Hardwood Decking Installers",
+      "Patios, Flagstones & Porcelain Paving",
+      "Garden Clearance & Green Waste Removal",
+      "Garden Office Pod & Shed Builders",
+      "Garden Irrigation & Sprinkler Systems",
+      "Digger & Plant Hire with Operator"
+    ]
+  },
+  {
+    "name": "🏡 Building Contractors, Extensions & Lofts",
+    "niches": [
+      "House Extensions & Wrap-Arounds",
+      "Loft Conversions & Dormers",
+      "Garage Conversions & Granny Annexes",
+      "Basement Conversions & Waterproofing",
+      "New Home Builders & Self-Build Contractors",
+      "Structural Steel Beam (RSJ) Installers",
+      "Bricklayers & Repointing Contractors",
+      "Groundworks, Foundations & Drainage",
+      "Underpinning & Subsidence Specialists",
+      "Restoration of Listed & Heritage Buildings"
+    ]
+  },
+  {
+    "name": "🍳 Kitchen, Bathroom & Interior Remodeling",
+    "niches": [
+      "Bespoke Kitchen Fitters & Designers",
+      "Luxury Bathroom Designers & Fitters",
+      "Walk-In Shower & Wet Room Specialists",
+      "Granite, Marble & Quartz Worktops",
+      "Kitchen Cabinet Spray Painting & Makeovers",
+      "Wall & Floor Tiling Specialists",
+      "Microcement & Venetian Plastering Bathrooms",
+      "Custom Fitted Wardrobes & Dressing Rooms",
+      "Accessible & Disabled Bathroom Adaptations"
+    ]
+  },
+  {
+    "name": "🎨 Painting, Decorating & Plastering",
+    "niches": [
+      "Interior Painters & Decorators",
+      "Exterior House Painting & Render Coating",
+      "Commercial Office Decorators",
+      "Wallpaper Hanging Specialists",
+      "Venetian Plastering & Polished Plaster",
+      "Plastering & Skimming Contractors",
+      "Drylining & Stud Wall Builders",
+      "Airless Spray Painting Contractors",
+      "UPVC Window & Door Spraying",
+      "Wood Floor Sanding & Varnishing"
+    ]
+  },
+  {
+    "name": "🪟 Windows, Doors, Glass & Locksmiths",
+    "niches": [
+      "Emergency 24/7 Locksmiths",
+      "Double Glazing Window Replacements",
+      "Bifold & Sliding Patio Doors",
+      "Composite Front Door Fitters",
+      "Conservatory Roof Replacement & Insulated Roofs",
+      "Garage Doors & Electric Roller Shutters",
+      "Window Misting & Double Glazing Repairs",
+      "Emergency Glaziers & Boarding Up",
+      "Architectural Glass & Balustrades",
+      "Awnings, Canopies & Pergolas"
+    ]
+  },
+  {
+    "name": "💧 Damp Proofing, Insulation & Pest Control",
+    "niches": [
+      "Rising Damp Proofing & Tanking",
+      "Woodworm & Dry Rot Treatment",
+      "Mould Remediation & Condensation Control",
+      "Cavity Wall & Loft Insulation Removal/Fitting",
+      "Spray Foam Removal Contractors",
+      "Wasp Nest & Rodent Pest Control",
+      "Bed Bug Heat Treatment Specialists",
+      "Bird Proofing & Solar Panel Mesh",
+      "Japanese Knotweed Removal & Treatment"
+    ]
+  },
+  {
+    "name": "🦷 Cosmetic Dentistry & Dental Specialists",
+    "niches": [
+      "Cosmetic Dentists (Smile Makeovers)",
+      "Dental Implants & All-on-4 Specialists",
+      "Invisalign & Clear Aligners Providers",
+      "Composite Bonding & Porcelain Veneers",
+      "Professional Laser Teeth Whitening",
+      "Emergency Private Dentists",
+      "Paediatric & Family Dental Practices",
+      "Endodontists & Root Canal Clinics",
+      "Periodontists & Gum Disease Treatments",
+      "Orthodontists (Braces)"
+    ]
+  },
+  {
+    "name": "💉 Medical Spas, Botox & Aesthetics",
+    "niches": [
+      "Botox & Dermal Filler Clinics",
+      "Lip Fillers & Facial Contouring",
+      "Laser Hair Removal Clinics",
+      "HydraFacial & Chemical Peels",
+      "Microneedling & RF Skin Tightening",
+      "Cryolipolysis (Fat Freezing) Clinics",
+      "Hair Transplant & FUE Surgeons",
+      "Permanent Makeup (Microblading & Ombre Brows)",
+      "Laser Tattoo Removal Clinics",
+      "Skin Tag, Mole & Cyst Removal Clinics",
+      "IV Vitamin Drip Therapy Lounges",
+      "PRP Vampire Facials & Hair Therapy"
+    ]
+  },
+  {
+    "name": "💆 Physical Therapy, Chiropractors & Wellness",
+    "niches": [
+      "Private Physiotherapy Clinics",
+      "Chiropractic Centers",
+      "Osteopaths & Spinal Specialists",
+      "Sports Injury & Deep Tissue Massage",
+      "Acupuncture & Traditional Chinese Medicine",
+      "Podiatrists, Chiropodists & Foot Clinics",
+      "Audiology, Hearing Tests & Earwax Removal",
+      "Colonic Hydrotherapy & Detox Clinics",
+      "Pilates Clinical Rehabilitation",
+      "Mental Health, CBT & Psychotherapy Practices"
+    ]
+  },
+  {
+    "name": "✂️ Luxury Hair Salons, Barbers & Nail Studios",
+    "niches": [
+      "Balayage & Hair Colour Specialists",
+      "Hair Extension Specialists (Tape/Weave/Keratin)",
+      "Luxury Master Barbershops",
+      "Russian Manicure & Nail Art Lounges",
+      "Lash Lift & Russian Volume Eyelashes",
+      "Afro & Textured Hair Specialist Salons",
+      "Bridal Hair & Makeup Artists",
+      "Keratin Treatment & Brazilian Blowouts",
+      "Scalp Micropigmentation (SMP) Clinics"
+    ]
+  },
+  {
+    "name": "🚗 Car Detailing, Ceramic Coating & PPF",
+    "niches": [
+      "Ceramic Coating & Paint Correction",
+      "Paint Protection Film (PPF) Installers",
+      "Vinyl Vehicle Wrapping & De-Chroming",
+      "Automotive Window Tinting",
+      "Mobile Car Valeting & Deep Cleaning",
+      "Alloy Wheel Refurbishment & Powder Coating",
+      "Car Leather & Interior Restoration",
+      "Paintless Dent Removal (PDR)",
+      "Headlight Restoration & Scratch Repair"
+    ]
+  },
+  {
+    "name": "🏎️ Mobile Mechanics, Garages & Auto Tuning",
+    "niches": [
+      "Mobile Mechanics (Come to your home/work)",
+      "ECU Engine Remapping & Chip Tuning",
+      "DPF Cleaning & EGR Delete Specialists",
+      "Auto Electricians & Dashcam Fitting",
+      "Gearbox & Transmission Rebuild Specialists",
+      "Clutch & Brake Replacement Specialists",
+      "24/7 Breakdown Recovery & Car Towing",
+      "MOT Testing Centers & Servicing",
+      "Classic & Prestige Car Restoration",
+      "Exhaust & Custom Cat-Back Fitting"
+    ]
+  },
+  {
+    "name": "🧹 Commercial Cleaning & Pressure Washing",
+    "niches": [
+      "Commercial Office & Janitorial Cleaning",
+      "High-Pressure Jet Washing & Patio Cleaning",
+      "Driveway & Render Softwashing Specialists",
+      "End of Tenancy Deep Cleaning",
+      "Carpet, Rug & Upholstery Cleaners",
+      "Commercial Window Cleaners (Reach & Wash)",
+      "Solar Panel Cleaning Specialists",
+      "Kitchen Extraction Duct Cleaning (TR19)",
+      "After Builders Deep Cleaning",
+      "Biohazard & Crime Scene Cleaners",
+      "Chimney Sweeps"
+    ]
+  },
+  {
+    "name": "📦 House Removals, Man with a Van & Storage",
+    "niches": [
+      "House Removals & Home Movers",
+      "Man with a Van (Local & Long Distance)",
+      "Office Relocation & IT Move Specialists",
+      "Waste Clearance, Rubbish Removal & House Clearance",
+      "Skip Hire Companies",
+      "Piano Movers & Specialist Heavy Goods",
+      "Self Storage Facilities",
+      "International Moving & Shipping Services",
+      "Packing & Fragile Wrapping Services"
+    ]
+  },
+  {
+    "name": "🐕 Pet Services, Dog Grooming & Kennels",
+    "niches": [
+      "Mobile Dog Grooming Vans",
+      "Dog Grooming Salons & Spas",
+      "Dog Daycare Centers & Puppy Crèches",
+      "Luxury Dog Boarding & Kennels",
+      "Dog Walking & Pet Sitting Services",
+      "Dog Trainers & Behavioural Specialists",
+      "Canine Hydrotherapy & Rehabilitation",
+      "Veterinary Clinics & Mobile Vets",
+      "Cat Boarding & Luxury Catteries",
+      "Equine & Horse Care Services"
+    ]
+  },
+  {
+    "name": "💍 Weddings, Photography & Film",
+    "niches": [
+      "Wedding Photographers",
+      "Wedding Videographers & Cinematic Films",
+      "Drone Aerial Photography & Video",
+      "Photo Booth & 360 Video Booth Hire",
+      "Family & Newborn Portrait Photographers",
+      "Commercial & Product Photographers",
+      "Headshot & Personal Branding Photographers",
+      "Wedding Planners & Coordinators",
+      "Bridal Wear & Wedding Dress Boutiques",
+      "Suit Hire & Bespoke Tailors"
+    ]
+  },
+  {
+    "name": "🎉 Events, Party Hire & Catering",
+    "niches": [
+      "Marquee & Luxury Gazebo Hire",
+      "Mobile Cocktail Bar & Barista Hire",
+      "Bouncy Castle & Inflatable Party Hire",
+      "Private Chef & Fine Dining Catering",
+      "Wedding Cake Designers & Dessert Tables",
+      "Hog Roast & BBQ Event Caterers",
+      "DJ, Lighting & Sound Hire (AV)",
+      "Live Bands & Acoustic Wedding Singers",
+      "Event Magicians & Entertainers",
+      "Balloon Garlands & Event Stylists",
+      "Furniture & Tableware Hire"
+    ]
+  },
+  {
+    "name": "💪 Fitness Studios, Martial Arts & Trainers",
+    "niches": [
+      "Private 1-on-1 Personal Training Studios",
+      "Reformer Pilates Studios",
+      "Boutique Yoga & Hot Yoga Studios",
+      "Brazilian Jiu-Jitsu (BJJ) & MMA Academies",
+      "Boxing & Kickboxing Gyms",
+      "CrossFit Boxes & Functional Fitness",
+      "Golf Simulator & PGA Coaching Studios",
+      "Swimming Lesson Schools for Kids",
+      "Gymnastics & Trampoline Clubs",
+      "Dance Studios (Ballet, Salsa, Pole)"
+    ]
+  },
+  {
+    "name": "⚖️ Legal, Accounting & Wealth Advisors",
+    "niches": [
+      "Chartered Accountants & Tax Advisors",
+      "Small Business Bookkeepers (Xero/QuickBooks)",
+      "Immigration Lawyers & Visa Consultants",
+      "Will Writing & Probate Solicitors",
+      "Conveyancing & Property Solicitors",
+      "Mortgage Brokers & Remortgage Advisors",
+      "Independent Financial Advisors (IFA)",
+      "Commercial Business Insurance Brokers",
+      "Employment Law & HR Consultants",
+      "Private Investigators & Surveillance",
+      "Notary Public & Apostille Services"
+    ]
+  },
+  {
+    "name": "🔒 Security, Locksmiths & Fire Safety",
+    "niches": [
+      "CCTV & Video Surveillance Installation",
+      "Wireless Intruder Alarm Systems",
+      "Access Control & Intercom Systems",
+      "Automatic Electric Gates & Barriers",
+      "Fire Alarm Installation & Fire Extinguisher Testing",
+      "Fire Door Inspection & Maintenance",
+      "Manned Security Guarding & Patrols",
+      "Safes & Security Grilles Installation"
+    ]
+  },
+  {
+    "name": "🎓 Specialty Tutors, Music & Driving Schools",
+    "niches": [
+      "Private Maths, Science & English Tutors",
+      "11+ & Entrance Exam Tutors",
+      "Independent Driving Instructors",
+      "Intensive Driving Course Providers",
+      "Piano, Keyboard & Guitar Teachers",
+      "Singing & Vocal Coaches",
+      "Language Tutors (Spanish, French, Arabic)",
+      "Drama, Acting & Speech Coaching",
+      "Flight Training & Pilot Schools"
+    ]
+  },
+  {
+    "name": "🍕 Restaurants, Bakeries & Food Experiences",
+    "niches": [
+      "Artisan Sourdough Bakeries & Pastry Shops",
+      "Boutique Coffee Roasters & Specialty Cafes",
+      "Neapolitan Pizzerias & Italian Trattorias",
+      "Gourmet Burger & Smokehouse Restaurants",
+      "Sushi & Japanese Izakaya Restaurants",
+      "Indian & Pakistani Fine Dining",
+      "Steakhouse & Grill Restaurants",
+      "Cocktail Lounges & Tapas Bars",
+      "Dark Kitchens & Ghost Restaurant Concepts",
+      "Microbreweries & Craft Beer Taprooms"
+    ]
+  },
+  {
+    "name": "🏢 Real Estate, Architects & Surveyors",
+    "niches": [
+      "Boutique Independent Estate Agents",
+      "Letting & Property Management Agencies",
+      "Chartered Surveyors & RICS Home Surveys",
+      "Architects & Planning Permission Consultants",
+      "Interior Designers & Home Staging",
+      "Party Wall Surveyors",
+      "Commercial Property Brokers",
+      "Drone Roof & Building Inspections",
+      "EPC (Energy Performance Certificate) Assessors"
+    ]
+  },
+  {
+    "name": "🖨️ Signage, Print & Workwear Embroidery",
+    "niches": [
+      "Shop Front Signs & 3D Illuminated Lettering",
+      "Vehicle Graphics & Van Signwriting",
+      "Custom Workwear & Embroidered Uniforms",
+      "Custom Neon Signs (LED)",
+      "Large Format Banner & Exhibition Printing",
+      "Laser Cutting & CNC Acrylic Fabrication",
+      "Screen Printing & Merchandise",
+      "Window Manifestation & Privacy Frosting"
+    ]
+  },
+  {
+    "name": "💻 IT Support, Web & Digital Marketing",
+    "niches": [
+      "Managed IT Support for Small Businesses",
+      "Cybersecurity & Data Backup Solutions",
+      "Computer & Laptop Repair Shops",
+      "Phone & Tablet Screen Repair Centers",
+      "Telecoms, VoIP & Business Phone Systems",
+      "Commercial Wi-Fi & Structured Cabling"
+    ]
+  },
+  {
+    "name": "🛋️ Luxury Furniture, Upholstery & Bespoke Carpentry",
+    "niches": [
+      "Bespoke Cabinet Makers",
+      "Custom Fitted Wardrobes & Dressing Rooms",
+      "Antique Furniture Restoration & French Polishing",
+      "Luxury Sofa Upholstery & Re-covering",
+      "Handmade Solid Wood Dining Tables",
+      "Acoustic Wooden Wall Panelling",
+      "Hardwood Floor Sanding & Parquet Restoration",
+      "Bespoke Radiator Covers & Bookcases",
+      "Made-to-Measure Plantation Shutters & Blinds",
+      "Custom Commercial Bar & Restaurant Fitters"
+    ]
+  },
+  {
+    "name": "🏊 Swimming Pools, Hot Tubs & Home Spas",
+    "niches": [
+      "Bespoke Swimming Pool Builders & Installers",
+      "Weekly Swimming Pool Maintenance & Valeting",
+      "Luxury Hot Tub & Jacuzzi Installation",
+      "Custom Home Saunas & Steam Room Installers",
+      "Swimming Pool Leak Detection & Liner Repair",
+      "Automatic Pool Covers & Telescopic Enclosures",
+      "Outdoor Plunge Pools & Cold Tubs",
+      "Commercial Spa & Health Club Servicing",
+      "Pool Heat Pump & Solar Heating Installers"
+    ]
+  },
+  {
+    "name": "🛥️ Yacht, Marine, Boat Repairs & Charter",
+    "niches": [
+      "Mobile Marine Engineers & Outboard Mechanics",
+      "Yacht Valeting, Gelcoat Repair & Antifouling",
+      "Marine Canvas, Sprayhoods & Boat Upholstery",
+      "Marine Electrical, Navigation & Radar Systems",
+      "Jet Ski Servicing, Repairs & Winterization",
+      "Private Yacht Charter & Luxury Boat Hire",
+      "Inboard Diesel Engine Servicing & Rebuilds",
+      "Boat Transport, Haulage & Dry Storage",
+      "Accredited Marine Surveyors & Valuers"
+    ]
+  },
+  {
+    "name": "🏗️ Plant Hire, Groundworks & Heavy Machinery",
+    "niches": [
+      "Mini Digger & Excavator Hire with Driver",
+      "Groundworks Contractors & Footings",
+      "Mobile Concrete Pumping Services",
+      "Demolition & Structural Dismantling",
+      "Grab Lorry Hire & Muck Away Waste Removal",
+      "Mobile Crane Hire & Contract Lifting",
+      "Site Clearance, Scrub Clearance & Bulk Earthworks",
+      "Septic Tank & Sewage Treatment Plant Installers"
+    ]
+  },
+  {
+    "name": "💎 Luxury Jewelry, Swiss Watch Repair & Gold",
+    "niches": [
+      "Custom Engagement Ring & Wedding Band Designers",
+      "Swiss Watch Servicing & Rolex Repair Specialists",
+      "Certified Diamond, Gold & Precious Metal Buyers",
+      "Antique & Vintage Jewelry Restoration",
+      "Bespoke Laser Jewelry Engraving & Resizing",
+      "Luxury Watch Polishing & Case Refurbishment",
+      "Pearl Stringing & Gemstone Setting",
+      "Independent Fine Jewelry Valuers & Appraisers"
+    ]
+  },
+  {
+    "name": "🌿 Heat Pumps, Battery Storage & Green Retrofit",
+    "niches": [
+      "Air Source Heat Pump (ASHP) Installers",
+      "Ground Source Heat Pump (GSHP) Specialists",
+      "Home Solar Battery Storage (Tesla Powerwall / GivEnergy)",
+      "Commercial EV Fleet Charging Points",
+      "Loft Spray Foam Removal & Remediation",
+      "External Wall Insulation (EWI) Systems",
+      "Underfloor Heating Installation & Screeding",
+      "Mechanical Ventilation with Heat Recovery (MVHR)"
+    ]
+  },
+  {
+    "name": "❄️ Commercial Refrigeration, Cold Rooms & HVAC",
+    "niches": [
+      "Commercial Refrigeration Engineers (24/7 Breakdowns)",
+      "Walk-in Modular Cold Rooms & Freezer Rooms",
+      "Cellar Cooling & Beer Line Chiller Specialists",
+      "Commercial Ice Machine Repair & Maintenance",
+      "Supermarket Display Chiller & Multideck Servicing",
+      "Blast Chiller Installation & Repair",
+      "Commercial Kitchen Canopies & Grease Extraction"
+    ]
+  },
+  {
+    "name": "✈️ VIP Chauffeur, Airport Transfers & Limousine",
+    "niches": [
+      "Executive Airport Transfer Chauffeurs",
+      "VIP Wedding Car Hire (Rolls Royce / Bentley)",
+      "Corporate Financial Roadshow Chauffeurs",
+      "Luxury Mercedes V-Class Minibus Hire",
+      "Private Close Protection Chauffeur Services",
+      "Supercar Hire & Prestige Vehicle Rentals",
+      "Long Distance Intercity Private Driver Hire"
+    ]
+  },
+  {
+    "name": "🩺 Private Healthcare, Podiatry & Diagnostics",
+    "niches": [
+      "Private GP & Executive Health Screening Clinics",
+      "Podiatrists, Chiropodists & Custom Orthotics",
+      "Audiologists & Microsuction Ear Wax Removal",
+      "Private Ultrasound & Diagnostic Scans (Baby / MSK)",
+      "Cognitive Behavioural Therapy (CBT) & Psychologists",
+      "Private Allergy & Food Intolerance Testing Clinics",
+      "Mobile Phlebotomy & Private Blood Testing",
+      "Speech & Language Therapy for Children & Adults"
+    ]
+  },
+  {
+    "name": "🎨 Bespoke Picture Framing & Art Restoration",
+    "niches": [
+      "Bespoke Museum-Grade Picture Framers",
+      "Oil Painting & Fine Art Cleaning & Restoration",
+      "Antique Clock & Barometer Repair Specialists",
+      "Custom Gilt & Leaf Mirror Framing",
+      "Fine Art Packaging, Crating & Shipping",
+      "Antique Furniture & Textile Conservation",
+      "Memorabilia, Sports Shirt & Object Framing"
+    ]
+  },
+  {
+    "name": "👶 Private Day Nurseries, Pre-Schools & Nannies",
+    "niches": [
+      "Private Montessori & Reggio Emilia Day Nurseries",
+      "Forest School & Outdoor Pre-Schools",
+      "Premium Maternity Nurses, Night Nannies & Doulas",
+      "Bilingual Nanny & Governess Placement Agencies",
+      "Children Sensory Play & Development Centers",
+      "Private Before & After School Care Clubs"
+    ]
+  },
+  {
+    "name": "🛡️ Industrial Roofing, Cladding & Liquid Plastics",
+    "niches": [
+      "Industrial Asbestos Roof Overcladding & Removal",
+      "Commercial Composite Wall & Roof Cladding",
+      "Flat Roof Liquid Plastics & Polyurethane Coatings",
+      "Industrial Gutter Relining (Plygene Approved)",
+      "Warehouse Skylight & Rooflight Replacement",
+      "Single Ply Membrane Commercial Roofers"
+    ]
+  }
+];
+
+let currentRates = { USD: 277.1, GBP: 366.0, EUR: 312.3, KWD: 898.0, BHD: 737.0, OMR: 720.7, AED: 75.5, SAR: 73.9, QAR: 76.1, CAD: 194.7, AUD: 192.0, CHF: 325.0, SGD: 216.4, NZD: 170.2, PKR: 1.0 };
+let activeCountry = CASCADING_COUNTRIES[0];
+
+function initCascadingSelectors() {
+  const qp = $('quickPresetSelect');
+  if (qp) {
+    qp.onchange = e => {
+      if (!e.target.value) return;
+      const [sIdx, nIdx] = e.target.value.split(',').map(Number);
+      pickDirectNiche(sIdx, nIdx);
+    };
+  }
+
+  const cSel = $('countrySelect');
+  cSel.innerHTML = CASCADING_COUNTRIES.map((c, i) => {
+    const rate = currentRates[c.curr] || 1;
+    return `<option value="${i}">${c.flag} ${c.name} (${c.curr} ${c.sym} · 1 = ~${Math.round(rate)} PKR)</option>`;
+  }).join('');
+  cSel.onchange = () => onCountryChange(+cSel.value);
+
+  const sSel = $('sectorSelect');
+  $('sectorCountBadge').textContent = `${CASCADING_SECTORS.length} Categories`;
+  sSel.innerHTML = CASCADING_SECTORS.map((s, i) => `<option value="${i}">${esc(s.name)}</option>`).join('');
+  sSel.onchange = () => onSectorChange(+sSel.value);
+
+  onCountryChange(0);
+  onSectorChange(0);
 }
+
+function onCountryChange(countryIndex) {
+  activeCountry = CASCADING_COUNTRIES[countryIndex] || CASCADING_COUNTRIES[0];
+  $('cc').value = activeCountry.cc;
+  $('activeMarketBadge').textContent = `${activeCountry.flag} ${activeCountry.name} Selected`;
+  $('tonePill').textContent = activeCountry.toneDesc;
+
+  const rate = currentRates[activeCountry.curr] || 1;
+  $('arbFlag').textContent = activeCountry.flag;
+  $('arbCountryTitle').textContent = `${activeCountry.name} (${activeCountry.curr} ${activeCountry.sym})`;
+  $('arbRateSub').textContent = `1 ${activeCountry.curr} ≈ ${rate} PKR · High Arbitrage Target`;
+
+  const dealPkr = Math.round(activeCountry.sampleDeal * rate).toLocaleString();
+  $('arbRoiPill').textContent = `💎 Recommended Deal: ${activeCountry.sym}${activeCountry.sampleDeal} = ₨ ${dealPkr} PKR`;
+
+  const rSel = $('regionSelect');
+  rSel.innerHTML = activeCountry.regions.map((r, i) => `<option value="${i}">${esc(r.name)}</option>`).join('');
+  rSel.onchange = () => onRegionChange(+rSel.value);
+  onRegionChange(0);
+
+  updateTemplateForCurrentSelection();
+}
+
+function onRegionChange(regionIndex) {
+  const reg = activeCountry.regions[regionIndex] || activeCountry.regions[0];
+  const citySel = $('citySelect');
+  citySel.innerHTML = reg.cities.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('');
+  citySel.onchange = () => syncLocationInput();
+  syncLocationInput();
+}
+
+function syncLocationInput() {
+  const customCity = $('customCityInput').value.trim();
+  $('location').value = customCity || $('citySelect').value;
+  preview();
+}
+
+function onSectorChange(sectorIndex) {
+  const sec = CASCADING_SECTORS[sectorIndex] || CASCADING_SECTORS[0];
+  const nSel = $('nicheSelect');
+  $('nicheCountBadge').textContent = `${sec.niches.length} niches`;
+  nSel.innerHTML = sec.niches.map(n => `<option value="${esc(n)}">${esc(n)}</option>`).join('');
+  nSel.onchange = () => syncBusinessInput();
+  syncBusinessInput();
+}
+
+function syncBusinessInput() {
+  const customNiche = $('customNicheInput').value.trim();
+  $('business').value = customNiche || $('nicheSelect').value;
+  preview();
+}
+
+function pickDirectNiche(secIdx, nicheIdx) {
+  const qp = $('quickPresetSelect');
+  if (qp) qp.value = `${secIdx},${nicheIdx}`;
+  document.querySelectorAll('#quickPicksTrack .quick-chip').forEach(c => c.classList.remove('active'));
+  if (window.event && window.event.currentTarget) window.event.currentTarget.classList.add('active');
+  $('sectorSelect').value = secIdx;
+  onSectorChange(secIdx);
+  $('nicheSelect').selectedIndex = nicheIdx;
+  syncBusinessInput();
+  showToast(`Selected niche: ${$('nicheSelect').value}`, 'info');
+}
+
+// Instant Niche Keyword Search across all 350+ niches
+$('nicheKeywordFilter').oninput = e => {
+  const query = e.target.value.toLowerCase().trim();
+  const box = $('filteredNichesBox');
+  if (!query) {
+    box.style.display = 'none';
+    box.innerHTML = '';
+    return;
+  }
+  const matches = [];
+  CASCADING_SECTORS.forEach((sec, sIdx) => {
+    sec.niches.forEach((niche, nIdx) => {
+      if (niche.toLowerCase().includes(query) || sec.name.toLowerCase().includes(query)) {
+        matches.push({ secIdx: sIdx, nicheIdx: nIdx, name: niche, secName: sec.name.split(' ')[0] });
+      }
+    });
+  });
+
+  if (!matches.length) {
+    box.style.display = 'block';
+    box.innerHTML = '<span style="font-size:11.5px;color:var(--text-dim)">No niches matching keyword. You can type it as a custom niche!</span>';
+  } else {
+    box.style.display = 'flex';
+    box.innerHTML = matches.slice(0, 15).map(m => 
+      `<span class="quick-chip" onclick="pickDirectNiche(${m.secIdx}, ${m.nicheIdx});$('filteredNichesBox').style.display='none';$('nicheKeywordFilter').value=''">
+        ${m.secName} ${esc(m.name)}
+      </span>`
+    ).join('');
+  }
+};
+
+// Toggle custom town/niche
+$('toggleCustomCity').onclick = () => {
+  const isHidden = $('customCityWrap').style.display === 'none';
+  $('customCityWrap').style.display = isHidden ? 'block' : 'none';
+  $('citySelect').style.display = isHidden ? 'none' : 'block';
+  $('toggleCustomCity').textContent = isHidden ? 'Back to wealthy towns list' : 'Or type a custom city/town';
+  syncLocationInput();
+};
+$('customCityInput').oninput = syncLocationInput;
+
+$('toggleCustomNiche').onclick = () => {
+  const isHidden = $('customNicheWrap').style.display === 'none';
+  $('customNicheWrap').style.display = isHidden ? 'block' : 'none';
+  $('nicheSelect').style.display = isHidden ? 'none' : 'block';
+  $('toggleCustomNiche').textContent = isHidden ? 'Back to micro-niches dropdown' : 'Or type custom niche';
+  syncBusinessInput();
+};
+$('customNicheInput').oninput = syncBusinessInput;
+
+// Currency Ticker
+function updateTicker(rates) {
+  currentRates = { ...currentRates, ...rates };
+  const items = [
+    { flag: '🇬🇧', c: 'GBP', idx: 0 },
+    { flag: '🇺🇸', c: 'USD', idx: 1 },
+    { flag: '🇦🇪', c: 'AED', idx: 2 },
+    { flag: '🇨🇭', c: 'CHF', idx: 6 },
+    { flag: '🇸🇦', c: 'SAR', idx: 5 },
+    { flag: '🇨🇦', c: 'CAD', idx: 4 },
+    { flag: '🇦🇺', c: 'AUD', idx: 3 },
+    { flag: '🇮🇪', c: 'EUR', idx: 7 },
+    { flag: '🇰🇼', c: 'KWD', idx: 11 },
+    { flag: '🇳🇿', c: 'NZD', idx: 8 },
+    { flag: '🇸🇬', c: 'SGD', idx: 13 }
+  ];
+  $('tickerItems').innerHTML = items.map(it => {
+    const val = currentRates[it.c] ? currentRates[it.c].toFixed(1) : '—';
+    return `<div class="ticker-card" onclick="$('countrySelect').value='${it.idx}';onCountryChange(${it.idx});showToast('Switched market to ${it.flag} ${it.c}', 'info')">
+      <span>${it.flag} <b>${it.c}</b>:</span>
+      <span class="rate-val">₨ ${val}</span>
+    </div>`;
+  }).join('');
+}
+
+// Pitch Angle Templates
+function getMessageTemplates() {
+  const sym = activeCountry.sym || '£';
+  const deal = activeCountry.sampleDeal || 250;
+  return {
+    'no-website': `Hi {name}, noticed your {category} business in {location} doesn't have an official website listed on Google Maps.
+
+Most customers check online before calling. I can build a clean, mobile-friendly website for your business for ${sym}${deal} so you don't lose local clients to competitors.
+
+Happy to send over a quick free mock-up if you'd like to take a look?
+
+If not relevant, just reply no and I won't message again.`,
+
+    'redesign': `Hi {name}, came across your {category} company in {location}. Your work looks great, but noticed your website takes a bit long to load on mobile phones.
+
+I help local businesses upgrade their site so it ranks higher on Google and gets more direct customer inquiries. 
+
+Would you be open to a 2-minute video showing what can be improved?
+
+If this isn't relevant, just reply no and I won't message again.`,
+
+    'reviews': `Hi {name}, great work on your Google Maps reputation in {location}!
+
+Did you know an automated WhatsApp follow-up can help your {category} business collect 2x to 3x more 5-star Google reviews from your happy clients automatically?
+
+Happy to send over a quick 1-minute demo if that could be helpful.
+
+If not interested, just reply no and I will not contact again.`,
+
+    'lead-bot': `Hi {name}, quick question — do you currently take customer inquiries or bookings via WhatsApp for your {category} business in {location}?
+
+We build instant WhatsApp reply systems for local businesses so you never miss an urgent quote request while you're busy working.
+
+Worth a quick look?
+
+If not relevant, reply no and I won't contact again.`
+  };
+}
+
+function pickPreset(presetKey) {
+  $('msgPreset').value = presetKey;
+  document.querySelectorAll('.preset-card').forEach(c => c.classList.remove('active'));
+  if (window.event && window.event.currentTarget) window.event.currentTarget.classList.add('active');
+  updateTemplateForCurrentSelection();
+  showToast(`Applied preset: ${presetKey}`, 'info');
+}
+
+function updateTemplateForCurrentSelection() {
+  const p = $('msgPreset').value || 'no-website';
+  const templates = getMessageTemplates();
+  $('template').value = templates[p] || templates['no-website'];
+  preview();
+}
+
+function insertTag(tag) {
+  const ta = $('template');
+  const start = ta.selectionStart || 0;
+  const end = ta.selectionEnd || 0;
+  const val = ta.value;
+  ta.value = val.substring(0, start) + tag + val.substring(end);
+  ta.focus();
+  ta.selectionStart = ta.selectionEnd = start + tag.length;
+  preview();
+  showToast(`Inserted ${tag}`, 'info');
+}
+
+// Health & Rates API
+api('/api/health').then(h => {
+  $('model').innerHTML = h.ollama?.length 
+    ? h.ollama.map(m => `<option>${esc(m)}</option>`).join('') 
+    : '<option value="">(Ollama not running - using smart templates)</option>';
+  const pick = h.ollama?.find(m => /llama3|qwen|gemma|mistral|phi/i.test(m));
+  if (pick) $('model').value = pick;
+
+  $('health').textContent = h.ollama?.length 
+    ? `Local AI: ${h.ollama.length} model(s)` 
+    : 'Smart Templates (Ollama optional)';
+
+  if (Array.isArray(h.notOnWa)) h.notOnWa.forEach(p => notOnWaSet.add(p));
+  if (h.rates) updateTicker(h.rates);
+  waStatus(h.wa || { state: 'disconnected' });
+});
+
+api('/api/rates').then(r => {
+  if (r.rates) {
+    updateTicker(r.rates);
+    initCascadingSelectors();
+  }
+}).catch(() => {
+  initCascadingSelectors();
+});
+
+// Search Scraper
+$('search').onclick = async () => {
+  $('search').disabled = true;
+  $('search').innerHTML = '⏳ Extracting Google Maps Leads…';
+  $('slog').textContent = '';
+  $('slog').hidden = false;
+
+  syncBusinessInput();
+  syncLocationInput();
+
+  logTo($('slog'), `Starting extraction for "${$('business').value}" in "${$('location').value}"…`);
+
+  const r = await api('/api/scrape', {
+    business: $('business').value.trim(),
+    location: $('location').value.trim(),
+    cc: $('cc').value.trim(),
+    depth: +$('depth').value,
+    deep: $('deep').checked
+  }).catch(e => ({ error: e.message }));
+
+  $('search').disabled = false;
+  $('search').innerHTML = '🔍 Search Leads Now';
+
+  if (r.error) {
+    logTo($('slog'), '✗ ' + r.error);
+    return showToast('Search error: ' + r.error, 'error');
+  }
+
+  leads = r.leads || [];
+  if (Array.isArray(r.notOnWa)) r.notOnWa.forEach(p => notOnWaSet.add(p));
+
+  const noWebTotal = leads.filter(l => !l.website || !l.website.trim()).length;
+  const onWaTotal = leads.filter(l => l.phone && !notOnWaSet.has(l.phone)).length;
+  
+  $('countAll').textContent = leads.length;
+  $('countNoWeb').textContent = noWebTotal;
+  $('countOnWa').textContent = onWaTotal;
+  $('pillCountAll').textContent = leads.length;
+  $('pillCountNoWeb').textContent = noWebTotal;
+  $('pillCountOnWa').textContent = onWaTotal;
+  $('prospectsTabSub').textContent = `${leads.length} Leads Found`;
+
+  logTo($('slog'), `✓ Complete! Extracted ${leads.length} total leads (${noWebTotal} without website).`);
+  showToast(`Found ${leads.length} leads (${noWebTotal} without website)!`, 'success');
+
+  if ($('focusNoWebsite').checked && noWebTotal > 0) {
+    setFilter('no-website');
+  } else {
+    setFilter('all');
+  }
+
+  custom = {};
+  $('custom').innerHTML = '';
+  preview();
+
+  setTimeout(() => switchStep(2), 500);
+};
+
+// Filter & Table System
+function setFilter(f) {
+  currentFilter = f;
+  $('filterWebsite').value = f;
+  
+  $('tabNoWeb').classList.toggle('gold-active', f === 'no-website');
+  $('tabAll').classList.toggle('active', f === 'all');
+  $('tabOnWa').classList.toggle('active', f === 'on-wa');
+  $('tabHasWeb').classList.toggle('active', f === 'has-website');
+
+  updateExportLink();
+  const visible = getVisibleLeads();
+  selected = new Set(visible.filter(l => l.phone && !notOnWaSet.has(l.phone)).map(l => l.phone));
+  drawTable();
+  preview();
+}
+
+function getVisibleLeads() {
+  const f = currentFilter;
+  let list = leads;
+
+  if (f === 'no-website') list = leads.filter(l => !l.website || !l.website.trim());
+  else if (f === 'has-website') list = leads.filter(l => !!(l.website && l.website.trim()));
+  else if (f === 'on-wa') list = leads.filter(l => l.phone && !notOnWaSet.has(l.phone));
+  else if (f === 'no-web-on-wa') list = leads.filter(l => (!l.website || !l.website.trim()) && l.phone && !notOnWaSet.has(l.phone));
+  else if (f === 'not-on-wa') list = leads.filter(l => l.phone && notOnWaSet.has(l.phone));
+
+  if (currentSearchQuery) {
+    const q = currentSearchQuery.toLowerCase();
+    list = list.filter(l => (l.name || '').toLowerCase().includes(q) || (l.phone || '').includes(q) || (l.category || '').toLowerCase().includes(q));
+  }
+
+  return list;
+}
+
+function updateExportLink() {
+  $('exportCsv').href = `/api/export.csv?filter=${encodeURIComponent(currentFilter)}`;
+}
+
+$('tableQuickSearch').oninput = e => {
+  currentSearchQuery = e.target.value.trim();
+  drawTable();
+};
+
+function drawTable() {
+  const visible = getVisibleLeads();
+
+  if (!visible.length) {
+    $('tbody').innerHTML = `<tr><td colspan="6" style="text-align:center;padding:48px;color:var(--text-muted)">
+      <div style="font-size:28px;margin-bottom:8px">🔍</div>
+      <div style="font-weight:700;font-size:14px;color:var(--text-primary)">No prospects matching this filter</div>
+      <div style="font-size:12px;margin-top:4px;color:var(--text-dim)">Try selecting "All Leads" or extract more businesses in Step 1.</div>
+    </td></tr>`;
+  } else {
+    $('tbody').innerHTML = visible.map(l => {
+      const hasWeb = !!(l.website && l.website.trim());
+      let webCell = '';
+      if (hasWeb) {
+        const u = l.website.startsWith('http') ? l.website : 'https://' + l.website;
+        const disp = l.website.replace(/^https?:\/\/(www\.)?/i, '').replace(/\/$/, '').slice(0, 24);
+        webCell = `<a href="${esc(u)}" target="_blank" rel="noopener" style="color:var(--accent-blue);text-decoration:none;font-weight:600">🌐 ${esc(disp)}</a>`;
+      } else {
+        webCell = `<span class="badge badge-no-web">⚡ NO WEBSITE (Pitch!)</span>`;
+      }
+      if (l.emails) {
+        webCell += `<div style="font-size:10.5px;color:var(--text-dim);margin-top:2px">✉️ ${esc(l.emails)}</div>`;
+      }
+
+      let phoneCell = '<span style="color:var(--text-dim)">no phone</span>';
+      let cbCell = '<span style="color:var(--text-dim)">–</span>';
+      if (l.phone) {
+        const isNotWa = notOnWaSet.has(l.phone);
+        const isCheckedWa = waCheckedMap[l.phone] === true;
+        let waBadge = '';
+        if (isNotWa) waBadge = ' <span class="badge badge-wa-no">No WA</span>';
+        else if (isCheckedWa) waBadge = ' <span class="badge badge-wa-ok">✓ WA OK</span>';
+        
+        const waLink = `<a class="wa-quick-link" href="https://wa.me/${l.phone}" target="_blank" title="Test in WhatsApp Web">chat ↗</a>`;
+        phoneCell = `<span style="font-family:var(--font-mono);font-size:12px;font-weight:600">+${l.phone}</span>${waBadge}${waLink}`;
+        cbCell = `<input type="checkbox" data-p="${l.phone}" ${selected.has(l.phone) ? 'checked' : ''} ${isNotWa ? 'title="Not on WhatsApp"' : ''} style="accent-color:var(--brand-primary);width:16px;height:16px;cursor:pointer">`;
+      }
+
+      let ratingDisplay = '<span style="color:var(--text-dim)">–</span>';
+      if (l.review_rating) {
+        ratingDisplay = `<span style="color:var(--accent-gold);font-weight:700">★ ${l.review_rating}</span>` + (+l.review_count ? ` <span style="font-size:10.5px;color:var(--text-dim)">(${l.review_count})</span>` : '');
+      }
+
+      return `<tr>
+        <td style="text-align:center">${cbCell}</td>
+        <td><b style="color:var(--text-primary)">${esc(l.name)}</b></td>
+        <td>${phoneCell}</td>
+        <td>${ratingDisplay}</td>
+        <td><span class="badge" style="background:var(--surface-hover);color:var(--text-secondary)">${esc(l.category)}</span></td>
+        <td>${webCell}</td>
+      </tr>`;
+    }).join('');
+  }
+
+  $('count').textContent = `${visible.length} shown · ${selected.size} selected`;
+  $('countSelected').textContent = selected.size;
+  $('sendingQuickCount').textContent = `(${selected.size} leads currently selected)`;
+
+  $('tbody').querySelectorAll('input[type="checkbox"]').forEach(cb => {
+    cb.onchange = () => {
+      cb.checked ? selected.add(cb.dataset.p) : selected.delete(cb.dataset.p);
+      $('count').textContent = `${visible.length} shown · ${selected.size} selected`;
+      $('countSelected').textContent = selected.size;
+      $('sendingQuickCount').textContent = `(${selected.size} leads currently selected)`;
+      preview();
+    };
+  });
+}
+
+// Master Checkbox Toggle
+$('masterSelectCb').onchange = e => {
+  const visible = getVisibleLeads();
+  if (e.target.checked) {
+    visible.filter(l => l.phone && !notOnWaSet.has(l.phone)).forEach(l => selected.add(l.phone));
+  } else {
+    visible.forEach(l => selected.delete(l.phone));
+  }
+  drawTable();
+  preview();
+};
+
+$('all').onclick = () => {
+  const visible = getVisibleLeads();
+  visible.filter(l => l.phone && !notOnWaSet.has(l.phone)).forEach(l => selected.add(l.phone));
+  $('masterSelectCb').checked = true;
+  drawTable();
+  preview();
+  showToast(`Selected all ${selected.size} leads`, 'info');
+};
+
+$('none').onclick = () => {
+  const visible = getVisibleLeads();
+  visible.forEach(l => selected.delete(l.phone));
+  $('masterSelectCb').checked = false;
+  drawTable();
+  preview();
+  showToast('Cleared lead selections', 'info');
+};
+
+// WhatsApp Check
+$('checkWa').onclick = async () => {
+  const phoneList = leads.filter(l => l.phone).map(l => l.phone);
+  if (!phoneList.length) return showToast('No businesses with phone numbers found.', 'warning');
+  
+  const h = await api('/api/health');
+  if (h.wa?.state !== 'connected') {
+    switchStep(4);
+    return showToast('Please link WhatsApp in Step 4 first to verify numbers.', 'warning');
+  }
+
+  $('checkWa').disabled = true;
+  $('checkWa').textContent = 'Checking numbers…';
+  showToast('Starting WhatsApp verification…', 'info');
+
+  try {
+    const res = await api('/api/wa/check', { phones: phoneList });
+    if (res.error) {
+      showToast('Verification error: ' + res.error, 'error');
+    } else {
+      if (res.results) {
+        Object.entries(res.results).forEach(([p, exists]) => {
+          waCheckedMap[p] = exists;
+          if (!exists) {
+            notOnWaSet.add(p);
+            selected.delete(p);
+          }
+        });
+      }
+      if (Array.isArray(res.notOnWa)) {
+        res.notOnWa.forEach(p => {
+          notOnWaSet.add(p);
+          selected.delete(p);
+        });
+      }
+      drawTable();
+      preview();
+      const onWaCount = phoneList.filter(p => !notOnWaSet.has(p)).length;
+      $('countOnWa').textContent = onWaCount;
+      $('pillCountOnWa').textContent = onWaCount;
+      showToast(`Verification complete: ${onWaCount} valid, ${phoneList.length - onWaCount} non-WhatsApp unchecked`, 'success');
+    }
+  } catch (e) {
+    showToast('Failed to check numbers: ' + e.message, 'error');
+  } finally {
+    $('checkWa').disabled = false;
+    $('checkWa').textContent = '✓ Verify WhatsApp Numbers';
+  }
+};
+
+// Message Preview & AI
+function preview() {
+  const visible = getVisibleLeads();
+  const l = visible.find(x => selected.has(x.phone)) || leads.find(x => selected.has(x.phone)) || {
+    name: 'Premier Local Business',
+    category: $('business').value || 'Contractor',
+    location: $('location').value || 'Guildford, UK',
+    business: $('business').value || 'Services'
+  };
+
+  $('mockLeadName').textContent = l.name || 'Premier Local Business';
+  $('mockAvatar').textContent = l.name ? l.name.charAt(0).toUpperCase() : '🏢';
+
+  const itemWithCurr = { currency: activeCountry.sym || '£', ...l };
+  const rawMsg = custom[l.phone] || ($('template').value ? render($('template').value, itemWithCurr) : '—');
+  $('preview').textContent = rawMsg;
+}
+
 $('template').oninput = preview;
 
-// ── step 3
+$('draft').onclick = async () => {
+  $('draft').disabled = true;
+  $('dnote').textContent = 'Drafting with local AI (Ollama)…';
+  showToast('Drafting tailored pitch with AI…', 'info');
+
+  const r = await api('/api/draft', {
+    business: $('business').value,
+    location: $('location').value,
+    offer: $('offer').value,
+    sender: $('sender').value,
+    model: $('model').value,
+    lang: $('lang').value,
+    country: activeCountry.name,
+    currency: activeCountry.sym
+  });
+
+  $('draft').disabled = false;
+  $('template').value = r.template;
+  preview();
+  
+  if (r.fallback) {
+    $('dnote').textContent = `Ollama offline (${r.error}) — smart preset template applied.`;
+    showToast('Ollama offline — smart preset template applied', 'warning');
+  } else {
+    $('dnote').textContent = `Drafted by local AI customized for ${activeCountry.name} market etiquette!`;
+    showToast('Bespoke message drafted by AI!', 'success');
+  }
+};
+
+$('personalise').onclick = async () => {
+  const list = leads.filter(l => selected.has(l.phone));
+  if (!list.length) return showToast('Search and select some businesses first.', 'warning');
+  if (!$('template').value.includes('{name}')) return showToast('Template must contain {name}.', 'warning');
+
+  $('personalise').disabled = true;
+  $('custom').innerHTML = '';
+  $('pnote').textContent = `Personalising 0/${list.length} with AI…`;
+  showToast(`Personalising ${list.length} messages…`, 'info');
+
+  const r = await api('/api/personalise', {
+    leads: list,
+    template: $('template').value,
+    business: $('business').value,
+    location: $('location').value,
+    offer: $('offer').value,
+    sender: $('sender').value,
+    model: $('model').value,
+    lang: $('lang').value,
+    country: activeCountry.name,
+    currency: activeCountry.sym
+  });
+
+  $('personalise').disabled = false;
+  if (r.error) {
+    $('pnote').textContent = '✗ ' + r.error;
+    showToast('Personalisation error: ' + r.error, 'error');
+  } else {
+    $('pnote').textContent = `✓ Done — ${list.length} bespoke messages ready below.`;
+    showToast(`${list.length} personalized messages created!`, 'success');
+  }
+};
+
+function addCustom(d) {
+  custom[d.phone] = d.message;
+  const div = document.createElement('div');
+  div.style.marginTop = '10px';
+  div.className = 'field-wrap';
+  div.innerHTML = `<label><b>${esc(d.name)}</b> · +${d.phone}${d.error ? ` <span style="color:#ef4444">(AI fallback used)</span>` : ''}</label><textarea style="min-height:80px"></textarea>`;
+  const ta = div.querySelector('textarea');
+  ta.value = d.message;
+  ta.oninput = () => { custom[d.phone] = ta.value; preview(); };
+  $('custom').appendChild(div);
+  preview();
+}
+
+// WhatsApp Connection & Status
 function waStatus(s) {
   const on = s.state === 'connected';
-  $('wapill').textContent = on ? `connected as +${s.user}` : s.state; $('wapill').className = 'pill' + (on ? ' on' : '');
-  if (on) $('qr').innerHTML = '';
-  $('wanote').textContent = (s.note || '') + (s.sentToday ? `  ·  sent today: ${s.sentToday}` : '');
-}
-$('connect').onclick = () => { $('wanote').textContent = 'Connecting…'; api('/api/wa/connect'); };
-$('logout').onclick = () => api('/api/wa/logout');
+  $('waHeaderPill').className = `status-pill clickable ${on ? 'online' : ''}`;
+  $('waHeaderDot').className = `pulse-dot ${on ? 'online' : 'warning'}`;
+  $('waHeaderText').textContent = on ? `WhatsApp: +${s.user}` : 'WhatsApp: Disconnected';
 
-// ── step 4
+  $('wapill').textContent = on ? `Connected as +${s.user}` : s.state;
+  $('wapill').className = `badge ${on ? 'badge-wa-ok' : 'badge-wa-no'}`;
+  
+  $('waStatusTitle').textContent = on ? `Connected to +${s.user}` : 'Connect WhatsApp Web';
+  $('waStatusDesc').textContent = on 
+    ? `Active session authenticated. Safe outreach enabled. Messages sent today: ${s.sentToday || 0}`
+    : 'Messages are dispatched directly from your own WhatsApp number. No external credentials needed.';
+
+  $('waTabSub').textContent = on ? `Connected (+${s.user})` : 'Safe Dispatcher';
+
+  if (on) $('qr').innerHTML = '';
+  $('wanote').textContent = (s.note || '') + (s.sentToday ? ` · Messages sent today: ${s.sentToday}` : '');
+}
+
+$('connect').onclick = () => {
+  $('wanote').textContent = 'Generating QR code…';
+  showToast('Requesting WhatsApp QR Code…', 'info');
+  api('/api/wa/connect');
+};
+
+$('logout').onclick = () => {
+  if (confirm('Disconnect this WhatsApp session?')) {
+    api('/api/wa/logout');
+    showToast('Logged out of WhatsApp', 'info');
+  }
+};
+
+// Campaign Dispatcher
 $('send').onclick = async () => {
   const t = $('template').value;
   const list = leads.filter(l => selected.has(l.phone)).map(l => ({ ...l, message: custom[l.phone] || '' }));
-  if (!t.includes('{name}') && !list.every(l => l.message)) return alert('The template must contain {name}.');
-  if (!list.length) return alert('Select at least one business with a phone number.');
-  if (!confirm(`Send to up to ${Math.min(list.length, +$('limit').value)} businesses from YOUR WhatsApp number?\n\nFirst message will read:\n\n${list[0].message || render(t, list[0])}`)) return;
-  const r = await api('/api/send', { leads: list, template: t, limit: +$('limit').value, minGap: +$('gmin').value, maxGap: +$('gmax').value });
-  if (r.error) alert(r.error); else { $('send').disabled = true; $('stop').disabled = false; $('log').textContent = ''; }
-};
-$('stop').onclick = () => api('/api/send/stop');
+  
+  if (!t.includes('{name}') && !list.every(l => l.message)) {
+    return showToast('The template must contain {name}.', 'warning');
+  }
+  if (!list.length) {
+    return showToast('Select at least one business with a phone number in Step 2.', 'warning');
+  }
 
-// ── live events
+  const sampleMsg = list[0].message || render(t, { currency: activeCountry.sym, ...list[0] });
+  const maxToSend = Math.min(list.length, +$('limit').value);
+  
+  if (!confirm(`Launch safe outreach to ${maxToSend} selected businesses from YOUR WhatsApp?\n\nFirst message sample:\n\n${sampleMsg}`)) return;
+
+  $('send').disabled = true;
+  $('stop').disabled = false;
+  $('log').textContent = '';
+  logTo($('log'), `Starting campaign to ${maxToSend} recipients…`);
+  showToast(`Campaign initiated for ${maxToSend} contacts`, 'success');
+
+  const r = await api('/api/send', {
+    leads: list,
+    template: t,
+    currency: activeCountry.sym,
+    limit: +$('limit').value,
+    minGap: +$('gmin').value,
+    maxGap: +$('gmax').value
+  });
+
+  if (r.error) {
+    showToast('Campaign failed to start: ' + r.error, 'error');
+    $('send').disabled = false;
+    $('stop').disabled = true;
+  }
+};
+
+$('stop').onclick = () => {
+  api('/api/send/stop');
+  showToast('Stopping campaign after current message…', 'warning');
+};
+
+// SSE
 const es = new EventSource('/api/events');
-es.addEventListener('qr', e => { $('qr').innerHTML = `<img alt="WhatsApp QR code" src="${JSON.parse(e.data).qr}">`; $('wanote').textContent = 'Scan this with WhatsApp → Linked devices. It refreshes every ~20 s.'; });
+
+es.addEventListener('qr', e => {
+  const data = JSON.parse(e.data);
+  $('qr').innerHTML = `
+    <div class="qr-code-box">
+      <img alt="WhatsApp QR code" src="${data.qr}" style="width:220px;height:220px;border-radius:8px">
+      <div style="font-size:12px;color:var(--text-primary);margin-top:10px;font-weight:700">
+        Scan in WhatsApp → Linked Devices
+      </div>
+    </div>`;
+  $('wanote').textContent = 'QR Code ready. Open WhatsApp on your phone → Linked devices → Link a device.';
+  showToast('WhatsApp QR Code is ready to scan!', 'info');
+});
+
 es.addEventListener('wa', e => waStatus(JSON.parse(e.data)));
-es.addEventListener('personalised', e => { const d = JSON.parse(e.data); addCustom(d); $('pnote').textContent = `Personalising ${d.i + 1}/${d.total}…`; });
-es.addEventListener('log', e => { const d = JSON.parse(e.data); logTo($('send').disabled ? $('log') : $('slog'), d.line); });
+es.addEventListener('personalised', e => {
+  const d = JSON.parse(e.data);
+  addCustom(d);
+  $('pnote').textContent = `Personalising ${d.i + 1}/${d.total}…`;
+});
+
+es.addEventListener('log', e => {
+  const d = JSON.parse(e.data);
+  logTo($('send').disabled ? $('log') : $('slog'), d.line);
+});
+
 es.addEventListener('progress', e => {
   const p = JSON.parse(e.data);
-  $('fill').style.width = p.total ? (100 * p.done / p.total) + '%' : '0';
+  const pct = p.total ? Math.round(100 * p.done / p.total) : 0;
+  $('fill').style.width = pct + '%';
+  $('progressPercent').textContent = pct + '%';
   $('sstat').textContent = `${p.sent} sent · ${p.done}/${p.total} processed${p.running ? '' : p.stopped ? ' · stopped' : ' · finished'}`;
-  if (p.last) logTo($('log'), `${p.last.ok ? '✓' : '✗'} ${p.last.name} (+${p.last.phone})${p.last.ok ? '' : ' — ' + p.last.reason}`);
-  if (!p.running) { $('send').disabled = false; $('stop').disabled = true; api('/api/health').then(h => waStatus(h.wa)); }
+
+  if (p.last) {
+    logTo($('log'), `${p.last.ok ? '✓' : '✗'} ${p.last.name} (+${p.last.phone})${p.last.ok ? '' : ' — ' + p.last.reason}`);
+  }
+
+  if (!p.running) {
+    $('send').disabled = false;
+    $('stop').disabled = true;
+    api('/api/health').then(h => waStatus(h.wa));
+    if (p.done > 0) showToast('Campaign batch completed!', 'success');
+  }
 });
+
+// Init on Load
+document.addEventListener('DOMContentLoaded', () => {
+  initTheme();
+  switchStep(1);
+});
+
 </script>
 </body>
 </html>

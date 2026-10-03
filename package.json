@@ -15,7 +15,7 @@
     "cold-outreach", "small-business-marketing", "whatsapp-automation", "lead-scraper"
   ],
   "license": "MIT",
-  "repository": { "type": "git", "url": "https://github.com/oyekamal/maps2whatsapp" },
+  "repository": { "type": "git", "url": "https://github.com/Iamabdulsalam786/Leadgeneration" },
   "dependencies": {
     "@whiskeysockets/baileys": "^7.0.0-rc14",
     "pino": "^10.3.1",

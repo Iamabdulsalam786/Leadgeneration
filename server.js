@@ -17,13 +17,53 @@ const log = line => emit('log', { line, ts: Date.now() });
 const json = (res, code, body) => { res.writeHead(code, { 'Content-Type': 'application/json' }); res.end(JSON.stringify(body)); };
 const body = req => new Promise(r => { let b = ''; req.on('data', d => b += d); req.on('end', () => r(b ? JSON.parse(b) : {})); });
 
-async function sendJob({ leads, template, limit = 15, minGap = 45, maxGap = 120 }) {
+const cachedRates = {
+  USD: 277.1,
+  GBP: 366.0,
+  EUR: 312.3,
+  KWD: 898.0,
+  BHD: 737.0,
+  OMR: 720.7,
+  AED: 75.5,
+  SAR: 73.9,
+  QAR: 76.1,
+  CAD: 194.7,
+  AUD: 192.0,
+  CHF: 325.0,
+  SGD: 216.4,
+  NZD: 170.2,
+  PKR: 1.0,
+  ts: Date.now()
+};
+
+async function updateRates() {
+  try {
+    const res = await fetch('https://open.er-api.com/v6/latest/USD', { signal: AbortSignal.timeout(6000) });
+    if (res.ok) {
+      const data = await res.json();
+      const pkr = data.rates?.PKR;
+      if (pkr) {
+        for (const c of Object.keys(cachedRates)) {
+          if (c === 'PKR' || c === 'ts') continue;
+          if (data.rates && data.rates[c]) {
+            cachedRates[c] = Number((pkr / data.rates[c]).toFixed(1));
+          }
+        }
+        cachedRates.ts = Date.now();
+      }
+    }
+  } catch (e) {}
+}
+updateRates();
+setInterval(updateRates, 3600000);
+
+async function sendJob({ leads, template, limit = 15, minGap = 45, maxGap = 120, currency = '$' }) {
   const done = wa.sentSet(); let n = 0, sent = 0;
   const todo = leads.filter(l => l.phone && !done.has(l.phone)).slice(0, limit);
   emit('progress', { total: todo.length, done: 0, sent: 0, running: true });
   for (const l of todo) { // ponytail: per-lead AI message (l.message) wins over the template
     if (job?.stop) break;
-    let r; try { r = await wa.send(l.phone, l.message || render(template, l), l.name); } catch (e) { r = { ok: false, reason: e.message }; }
+    let r; try { r = await wa.send(l.phone, l.message || render(template, { currency, ...l }), l.name); } catch (e) { r = { ok: false, reason: e.message }; }
     n++; if (r.ok) sent++;
     emit('progress', { total: todo.length, done: n, sent, running: true, last: { name: l.name, phone: l.phone, ...r } });
     if (r.ok && n < todo.length && !job?.stop) { // ponytail: human-like gap; WhatsApp bans burst senders
@@ -39,7 +79,7 @@ async function sendJob({ leads, template, limit = 15, minGap = 45, maxGap = 120 
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, 'http://x');
   try {
-    if (req.method === 'GET' && url.pathname === '/') { res.writeHead(200, { 'Content-Type': 'text/html' }); return res.end(fs.readFileSync(path.join(__dirname, 'public/index.html'))); }
+    if ((req.method === 'GET' || req.method === 'HEAD') && url.pathname === '/') { res.writeHead(200, { 'Content-Type': 'text/html' }); return res.end(fs.readFileSync(path.join(__dirname, 'public/index.html'))); }
     if (url.pathname === '/api/events') {
       res.writeHead(200, { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache', Connection: 'keep-alive' });
       clients.add(res); req.on('close', () => clients.delete(res));
@@ -47,16 +87,36 @@ const server = http.createServer(async (req, res) => {
       if (wa.qr) res.write(`event: qr\ndata: ${JSON.stringify({ qr: wa.qr })}\n\n`);
       return;
     }
-    if (url.pathname === '/api/health') return json(res, 200, { ollama: await llm.models(), wa: wa.status(), sending: !!job });
+    if (url.pathname === '/api/health') return json(res, 200, { ollama: await llm.models(), wa: wa.status(), sending: !!job, notOnWa: Array.from(wa.notOnWaSet()), rates: cachedRates });
+    if (url.pathname === '/api/rates') return json(res, 200, { rates: cachedRates });
     if (req.method === 'POST' && url.pathname === '/api/scrape') {
       const b = await body(req);
       if (!b.business || !b.location) return json(res, 400, { error: 'business and location are required' });
       lastLeads = await scrape({ ...b, log });
-      return json(res, 200, { leads: lastLeads });
+      return json(res, 200, { leads: lastLeads, notOnWa: Array.from(wa.notOnWaSet()) });
     }
     if (url.pathname === '/api/export.csv') {
+      const f = url.searchParams.get('filter');
+      const notOnWa = wa.notOnWaSet();
+      let out = lastLeads;
+      if (f === 'no-website') out = lastLeads.filter(l => !l.website || !l.website.trim());
+      else if (f === 'has-website') out = lastLeads.filter(l => !!(l.website && l.website.trim()));
+      else if (f === 'on-wa') out = lastLeads.filter(l => l.phone && !notOnWa.has(l.phone));
+      else if (f === 'no-web-on-wa') out = lastLeads.filter(l => (!l.website || !l.website.trim()) && l.phone && !notOnWa.has(l.phone));
+      else if (f === 'not-on-wa') out = lastLeads.filter(l => l.phone && notOnWa.has(l.phone));
       res.writeHead(200, { 'Content-Type': 'text/csv', 'Content-Disposition': 'attachment; filename="leads.csv"' });
-      return res.end(toCsv(lastLeads, ['name', 'phone', 'emails', 'website', 'category', 'address', 'review_rating', 'review_count']));
+      return res.end(toCsv(out, ['name', 'phone', 'emails', 'website', 'category', 'address', 'review_rating', 'review_count']));
+    }
+    if (req.method === 'POST' && url.pathname === '/api/wa/check') {
+      if (wa.state !== 'connected') return json(res, 400, { error: 'Please connect WhatsApp in step 3 first' });
+      const b = await body(req);
+      if (!b.phones || !Array.isArray(b.phones)) return json(res, 400, { error: 'phones array required' });
+      try {
+        const results = await wa.checkNumbers(b.phones);
+        return json(res, 200, { results, notOnWa: Array.from(wa.notOnWaSet()) });
+      } catch (e) {
+        return json(res, 500, { error: e.message });
+      }
     }
     if (req.method === 'POST' && url.pathname === '/api/draft') {
       const b = await body(req);
